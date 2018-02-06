@@ -1,0 +1,91 @@
+# Bartok Rules
+
+*    Players: 4
+
+#### Start of a game set
+
+*    All players start at 0 point
+*    Player left to the dealer starts a round
+
+#### Start of a game
+
+*    From a shuffled deck, each player draws 5 cards
+*    Flip the top card (of center pile) over, put top card at face-up pile
+*    Player left of dealer starts their turn (and turns are executed in clockwise order)
+
+#### Turns of a game
+
+*    Actions ( 1 per player’s turn )
+    *    Play a card that has same suit with top card at face-up pile
+    *    Play a card that has same rank with top card at face-up pile
+    *    Draw a card
+    *    End
+*    Triggers
+    *    No more cards in center pile after Action -> all but top card shuffled and flipped over and placed into the empty center-pile
+
+#### Goals of a game
+
+*    No more cards in hand
+
+#### After each game
+
+*    Winner of the round gets a point
+
+#### Goals of a game set
+
+*    First player to 5 points
+
+# Spades Rules
+
+*    Players: 4
+
+
+#### Start of a Game
+
+*    Each player draws 13 cards
+*    Each player name number of expected wins of round(a bid)
+*    Player left to the dealer leads the first round
+
+#### Start of a Round
+
+*    (Leading Player) Player who won last round plays any card in their hand
+
+#### Turns of a Round
+
+*    Next player to the left plays the next card at the face-up pile
+
+#### End of a Round
+
+*    The highest rank of the suit played by the leading player wins the round
+*    Spades always win and if a spade was played then the highest spade wins the round
+
+#### End of a Game
+
+*    Game ends after 13 rounds (All cards are played)
+*    Players are awarded 1 point if they won as many rounds as they bid
+*    Points are awarded and calculated
+*    Deck is shuffled
+*    Dealer rotates to the next player on the left
+*    If there is no winner, next game begins
+
+#### End of a Gameset
+
+*    Gameset ends when at least one player reaches 5 points
+
+
+# Differences
+
+*    Spades players start with ¼ deck VS Bartock start with 5 cards
+*    Spades does not involve any drawing VS Bartock has conditions for drawing a card
+*    Spades allows ties VS Bartock does not
+*    Spades has rounds VS Bartock does not
+
+
+# Similarities
+
+*    Game consists of 4 players
+*    Players play in an order relative to their sitting position
+*    Both have multiple games in a game set
+*    Players play counter-clockwise (to the left)
+*    Start of Game rotates starting from left of dealer
+*    Winner is first to 5 points
