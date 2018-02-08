@@ -3,5 +3,7 @@ Programming Languages
 
 #Team Members :
 Edward Chan
+
 Connor Crothers
-Nathan Crist
+
+Ahmad Husein
