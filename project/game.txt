@@ -1,0 +1,14 @@
+Decks:
+	draw deck
+	face-up deck
+Starting hand size: 5
+Number players: 4
+                                                                                                                         
+When start                                           then initialize game                        to game starts
+When game starts                                     then begin turn                             to player turn started
+When player turn started if player has playable card then player plays card into face-up deck    to player turn ended
+When player turn started                             then player draws card from draw deck       to player turn ended
+When player turn ended   if player hand not empty    then rotate players                         to player turn started
+When player turn ended   if play hand is empty       then player gets a point                    to player wins
+When player wins         if player has 5 points      then player wins whole game                 to end game
+When player wins         if player has less 5 points then initialize new game                    to game start
