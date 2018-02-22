@@ -49,20 +49,22 @@ class State(o):
     def id(i):
         return "%s('%s')" % (i.__class__.__name__, i.name)
 
-    def trans(i, gaurd, action, destination):
-        i._trans += [Transition(i, gaurd, action, destination)]
+    def trans(i, guards, actions, destination):
+        i._trans += [Transition(i, guards, actions, destination)]
 
     def step(i):
-        for j in shuffle(i._trans):
-            if j.gaurd(i):
-                if j.action is not None: j.action(j)
+        for t in i._trans:
+            if False not in [val for val in map(lambda f:f(t),t.guards)]:
+                if t.actions is not None:
+                    for action in t.actions:
+                        action(t)
                 i._universalOnExit()
                 i.onExit()
-                j.destination._universalPreparePayload()
-                j.destination.preparePayload()
-                j.destination._universalOnEntry()
-                j.destination.onEntry()
-                return j.destination
+                t.destination._universalPreparePayload()
+                t.destination.preparePayload()
+                t.destination._universalOnEntry()
+                t.destination.onEntry()
+                return t.destination
         return i
 
     def _universalPreparePayload(i):
@@ -85,7 +87,7 @@ class State(o):
         call to onEntry. Overriding will cause that state
         to use it's function instead of the universal one.
         """
-        print("%s  => " % i.name, end='') # DEBUG
+        # print("%s  => " % i.name, end='') # DEBUG
         pass
 
     def _universalOnExit(i):
@@ -134,7 +136,7 @@ class Exit(State):
 
 # ---------------------------------------
 class Transition(o):
-    def __init__(i, _current, gaurd, action, destination):
+    def __init__(i, _current, guards, actions, destination):
         for k,v in locals().items(): i.__dict__[k]=v
         del i.__dict__['i']
         # if i.action: i.action._i=i
@@ -166,8 +168,8 @@ class Machine(o):
         if isinstance(y,Start): i.start = y
         return y
 
-    def trans(i, here, gaurd, action, destination):
-        i.state(here).trans(gaurd, action, i.state(destination))
+    def trans(i, here, guards, actions, destination):
+        i.state(here).trans(guards, actions, i.state(destination))
 
     def run(i):
         state = i.start

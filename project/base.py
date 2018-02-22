@@ -9,6 +9,10 @@ def about(f):
     if f.__doc__:
         print("# " + re.sub(r'\n[ \t]*', "\n# ", f.__doc__))
 
+def indentedlist(list, indent=0):
+    indentStr = ''.join(["\t" for i in range(0,indent)])
+    return indentStr + str("\n"+indentStr).join(map(lambda item:str(item), list))
+
 
 TRY = FAIL = 0
 
