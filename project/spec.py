@@ -36,6 +36,8 @@ def spec_bartok(m, s, t):
 
 
 def spec_spade(m, s, t):
+    start   = s("start>|"         )
+    newgame = s("game starts"     )
     return
 
 # @ok
