@@ -86,6 +86,14 @@ def selectCardOrDraw(t):
     options = hand() + ['draw']
     return choose("play a card",options,autoplay=False) == 'draw'
 
+def playCardOrDraw(t):
+    card = load.choice
+    if card == 'draw':
+        draw(load.decks[0], hand())
+    if card in hand():
+        load.decks[1]+=[card]
+        hand().remove(card)
+
 def chooseCard(t):
     return choose("play a card",options,autoplay=False) == 'draw'
     
