@@ -35,6 +35,9 @@ def spec_bartok(m, s, t):
     t(wingame   , [m.true]      , [rotateStartingPlayer, initGame]   , newgame   ) # player has less 5 points
 
 
+def spec_spade(m, s, t):
+    return
+
 # @ok
 def machine2():
     """preserved original machine 2"""
