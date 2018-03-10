@@ -36,8 +36,20 @@ def spec_bartok(m, s, t):
 
 
 def spec_spade(m, s, t):
-    start   = s("start>|"         )
-    newgame = s("game starts"     )
+    start     = s("start|>"             )
+    newgame   = s("game starts"         )
+    startturn = s("player turn started" )           
+    endturn   = s("player turn ended"   )
+    endRound  = s("player round ended"  )
+    wingame   = s("player wins"         )
+
+    t(start,        [m.true],           [initPayloadSpades, initGameSpade, logGame],    newgame     )
+    t(newgame,      [m.true],           [logTurn],                                      startturn   )
+    t(startturn,    [m.true],           [chooseCard, playCard],                         endturn     )
+    t(endturn,      [notEqualHands],    [rotatePlayer, logTurn],                        startturn   )
+    t(endturn,      [m.true],           [score, logRound],                              endRound    )
+    t(endRound,     [hasFive],          [announceWinner],                               wingame     )
+    t(endRound      [m.true],           [initPayloadSpade, logGame],                    newgame     )
     return
 
 # @ok

@@ -9,7 +9,7 @@ def initDecks():
     load["decks"] = [[card for card in deck] for deck in load["initialDecks"]]
 
 def transferCards(fromDeck, toDeck):
-    toDeck = toDeck + fromDeck;
+    toDeck = toDeck + fromDeck
     fromDeck = []
 
 def deal():
@@ -48,11 +48,26 @@ def initPayload(t):
     load["initialDecks"] = [drawDeck, faceDeck]
     initDecks()
 
+def initPayloadSpade(t):
+    load["startingPlayer"]=1
+    load["currentPlayer"]=1
+    load["numPlayers"]=4
+    load["initialHandSize"]=13
+    drawDeck = shuffle([str(rank) + suit for suit in ['h','s','d','c'] for rank in range(1,14)])
+    faceDeck = []
+    load["initialDecks"] = [drawDeck, faceDeck]
+    initDecks()
+    deal()
+
 def initGame(t):
     load.currentPlayer=load.startingPlayer
     load.scores = [0 for i in range(0, load.numPlayers)]
     initDecks()
     deal()
+
+def initGameSpade(t):
+    load.currentPlayer=load.startingPlayer
+    load.scores = [0 for i in range(0, load.numPlayers)]
 
 def rotateStartingPlayer(t):
     load.startingPlayer=load.startingPlayer%load.numPlayers+1
@@ -67,7 +82,9 @@ def selectCardOrDraw(t):
     options = hand() + ['draw']
     return choose("play a card",options,autoplay=False) == 'draw'
 
-def playCardOrDraw(t):
+def chooseCard(t):
+    return choose("play a card",options,autoplay=False) == 'draw'
+    
     card = load.choice
     if card == 'draw':
         draw(load.decks[0], hand())
