@@ -48,7 +48,7 @@ def initPayload(t):
     load["initialDecks"] = [drawDeck, faceDeck]
     initDecks()
 
-def initPayloadSpade(t):
+def initPayloadSpades(t):
     load["startingPlayer"]=1
     load["currentPlayer"]=1
     load["numPlayers"]=4
@@ -56,9 +56,13 @@ def initPayloadSpade(t):
     drawDeck = shuffle([str(rank) + suit for suit in ['h','s','d','c'] for rank in range(1,14)])
     faceDeck = []
     load["initialDecks"] = [drawDeck, faceDeck]
+    load.points = [0 for i in range(0, load.numPlayers)]
     initDecks()
     deal()
 
+def cleanPile(t):
+    load.deck[1] = []
+    
 def initGame(t):
     load.currentPlayer=load.startingPlayer
     load.scores = [0 for i in range(0, load.numPlayers)]

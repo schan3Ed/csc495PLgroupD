@@ -43,13 +43,14 @@ def spec_spade(m, s, t):
     endRound  = s("player round ended"  )
     wingame   = s("player wins"         )
 
-    t(start,        [m.true],           [initPayloadSpades, initGameSpade, logGame],    newgame     )
-    t(newgame,      [m.true],           [logTurn],                                      startturn   )
+    t(start,        [m.true],           [initPayloadSpades, initGameSpade, log],        newgame     )
+    t(newgame,      [m.true],           [log],                                          startturn   )
     t(startturn,    [m.true],           [chooseCard, playCard],                         endturn     )
-    t(endturn,      [notEqualHands],    [rotatePlayer, logTurn],                        startturn   )
-    t(endturn,      [m.true],           [score, logRound],                              endRound    )
-    t(endRound,     [hasFive],          [announceWinner],                               wingame     )
-    t(endRound      [m.true],           [initPayloadSpade, logGame],                    newgame     )
+    t(endturn,      [notEqualHands],    [rotatePlayer, log    ],                        startturn   )
+    t(endturn,      [m.true],           [updatePoints, log    ],                        endRound    )
+    t(endRound,     [handIsEmpty, hasFive],        [announceWinner],                    wingame     )
+    t(endRound      [handIsEmpty],      [initPayloadSpades, log],                       newgame     )
+    t(endRound      [m.true],           [cleanPile],                                    startturn   )
     return
 
 # @ok
