@@ -13,9 +13,9 @@ def transferCards(fromDeck, toDeck):
     fromDeck = []
 
 def deal():
-    load["players"]=[[] for i in range(4)]
+    load["playersHand"]=[[] for i in range(4)]
     d = load.decks[0]
-    for p in load.players:
+    for p in load.playersHand:
         for i in range(0,load.initialHandSize):
             draw(d,p)
 
@@ -62,7 +62,7 @@ def initPayloadSpades(t):
 
 def cleanPile(t):
     load.deck[1] = []
-    
+
 def initGame(t):
     load.currentPlayer=load.startingPlayer
     load.scores = [0 for i in range(0, load.numPlayers)]
@@ -77,7 +77,7 @@ def rotateStartingPlayer(t):
     load.startingPlayer=load.startingPlayer%load.numPlayers+1
 
 def hand():
-    return load.players[load.currentPlayer-1]
+    return load.playersHand[load.currentPlayer-1]
 
 def rotatePlayer(t):
     load.currentPlayer=int(load.currentPlayer)%load.numPlayers+1
@@ -104,7 +104,7 @@ def handIsEmpty(t):
 
 def announceWinner(t):
     print("\nPLAYER %s wins this game" % load.currentPlayer)
-    scores = ["player%s: %s" % (idx,score) for idx, score in enumerate(load.players)]
+    scores = ["player%s: %s" % (idx,score) for idx, score in enumerate(load.playersHand)]
     print("Updated Scoreboard:\n%s\n" % indentedlist(scores, indent=1))
 
 def incrementScore(t):
@@ -119,7 +119,7 @@ def invalidMessage(t):
 def log(i):
     print("\ndeck: %s" % load.decks[0])
     print("pile: %s" % load.decks[1])
-    hands = ["player%s: %s" % (idx,hand) for idx, hand in enumerate(load.players)]
+    hands = ["player%s: %s" % (idx,hand) for idx, hand in enumerate(load.playersHand)]
     print("hands: \n%s" % indentedlist(hands, indent=1))
     if 'choice' in load.keys():
         print("choice: %s" % load.choice)
