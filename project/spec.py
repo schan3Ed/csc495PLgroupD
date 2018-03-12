@@ -43,14 +43,14 @@ def spec_spade(m, s, t):
     endRound  = s("player round ended"  )
     wingame   = s("player wins"         )
 
-    t(start,        [m.true],           [initPayloadSpades, initGameSpade, log],        newgame     )
-    t(newgame,      [m.true],           [log],                                          startturn   )
-    t(startturn,    [m.true],           [chooseCard, playCardOrDraw],                   endturn     )
-    t(endturn,      [notEqualHands],    [rotatePlayer, log    ],                        startturn   )
-    t(endturn,      [m.true],           [updatePoints, log    ],                        endRound    )
-    t(endRound,     [handIsEmpty, hasFive],        [announceWinner],                    wingame     )
-    t(endRound      [handIsEmpty],      [initPayloadSpades, log],                       newgame     )
-    t(endRound      [m.true],           [cleanPile],                                    startturn   )
+    t(start,        [m.true],               [initPayloadSpades, initGameSpade, log], newgame     )
+    t(newgame,      [m.true],               [selectCardOrDraw],                      startturn   )
+    t(startturn,    [m.true],               [playCardOrDraw, log],                   endturn     )
+    t(endturn,      [notEqualHands],        [rotatePlayer, selectCardOrDraw],        startturn   )
+    t(endturn,      [m.true],               [updatePoints,],                         endRound    )
+    t(endRound,     [handIsEmpty, hasFive], [announceWinner],                        wingame     )
+    t(endRound,     [handIsEmpty],          [initPayloadSpades],                     newgame     )
+    t(endRound,     [m.true],               [cleanPile, selectCardOrDraw],           startturn   )
     return
 
 # @ok
@@ -62,7 +62,7 @@ def machine2():
 def machine3():
     """wrapped try catch here so that it doesn't catch sub machines, only parent machine"""
     try:
-        make(Machine("bartok"), spec_bartok).run()
+        make(Machine("bartok"), spec_spade).run()
         print('\nFINAL PAYLOAD = ' + str(load))
     except State.FSMLimit as e:
         print(e.args[0].upper())

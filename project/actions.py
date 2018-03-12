@@ -58,10 +58,9 @@ def initPayloadSpades(t):
     load["initialDecks"] = [drawDeck, faceDeck]
     load.points = [0 for i in range(0, load.numPlayers)]
     initDecks()
-    deal()
 
 def cleanPile(t):
-    load.deck[1] = []
+    del load.decks[1][:]
 
 def initGame(t):
     load.currentPlayer=load.startingPlayer
@@ -72,12 +71,21 @@ def initGame(t):
 def initGameSpade(t):
     load.currentPlayer=load.startingPlayer
     load.scores = [0 for i in range(0, load.numPlayers)]
+    initDecks()
+    deal()
 
 def rotateStartingPlayer(t):
     load.startingPlayer=load.startingPlayer%load.numPlayers+1
 
 def hand():
     return load.playersHand[load.currentPlayer-1]
+
+def notEqualHands(t):
+    c = len(hand())
+    for x in load.playersHand:
+        if len(x) != c:
+            return True
+    return False
 
 def rotatePlayer(t):
     load.currentPlayer=int(load.currentPlayer)%load.numPlayers+1
@@ -117,6 +125,10 @@ def announceWinner(t):
 
 def incrementScore(t):
     load.scores[load.currentPlayer-1]+=1
+
+def updatePoints(t):
+    load.points[load.currentPlayer-1]+=1
+    print("player %s now has %s points" % (load.currentPlayer, load.points[load.currentPlayer-1]))
 
 def hasFive(t):
     return load.scores[load.currentPlayer-1]==5
