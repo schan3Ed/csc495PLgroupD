@@ -114,5 +114,6 @@ def log(i):
     printlog("current player: %s" % load.currentPlayer)
     printlog("starting player: %s" % load.startingPlayer)
     printlog("scores: %s" % load.scores)
+    printlog("state path: " + load.path)
     printlog("###########################################################\n")
 ##############################
