@@ -106,7 +106,7 @@ class State(o):
     def quit(i): # Returning indicates it's the last state of the machine
         return False
 
-    class FSMLimit(Exception): STEP_LIMIT = 3000
+    class FSMLimit(Exception): STEP_LIMIT = 10000
 
 class NestedState(State):
     tag = "#"

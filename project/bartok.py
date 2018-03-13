@@ -28,10 +28,10 @@ def spec_bartok(m, s, t):
     endgame   = s("end game."           )
 
     def logBeforeTurn():
-        print(colors.magenta("\nAFTER PLAYER'S CHOICE BUT BEFORE CARD IS PLAYED"))
+        print(colors.magenta("\n# AFTER PLAYER'S CHOICE BUT BEFORE CARD IS PLAYED"))
         log(None)
     def logAfterTurn():
-        print(colors.magenta("\nAFTER CARD IS PLAYED"))
+        print(colors.magenta("\n# AFTER CARD IS PLAYED"))
         log(None)
     startturn.onEntry = logBeforeTurn
     endturn.onEntry = logAfterTurn
@@ -48,13 +48,13 @@ def spec_bartok(m, s, t):
     # this is because the second transition's guards are only called if at least one of the previous transition's guards returned False 
 
   # t(FROM      , GAURDS        , ACTIONS                              , TO)
-    t(start     , [m.true]      , [initPayload ,initGame, log]         , newgame   ) # prepare game data and setup for new game
+    t(start     , [m.true]      , [initPayload ,initGame]              , newgame   ) # prepare game data and setup for new game
     t(newgame   , [m.true]      , [chooseCard]                         , startturn ) # player starts turn by choosing a card from hand or drawing one
-    t(startturn , [playIsValid] , [play, log]                          , endturn   ) # if chosen card is valid choice based on game rules then play the card
+    t(startturn , [playIsValid] , [play]                               , endturn   ) # if chosen card is valid choice based on game rules then play the card
     t(startturn , [m.true]      , [invalidMessage, chooseCard]         , startturn ) # if chosen card isn't valid then display error and choose again
     t(endturn   , [handIsEmpty] , [incrementScore, announceGameWinner] , wingame   ) # if player hand is empty then anounce game winner and give player 1 point
     t(endturn   , [m.true]      , [rotatePlayer, chooseCard]           , startturn ) # if player hand is not empty then rotate player and have new player start turn by choosing a card from hand or drawing one 
-    t(wingame   , [hasFive]     , None                                 , endgame   ) # if player reaches 5 points then they win the gameset and gameset ends
+    t(wingame   , [hasFive]     , [announceGameSetWinner]              , endgame   ) # if player reaches 5 points then they win the gameset and gameset ends
     t(wingame   , [m.true]      , [rotateStartingPlayer, initGame]     , newgame   ) # if player has less than 5 points then rotate starting player and setup new game
 ##############################
 
@@ -82,7 +82,8 @@ def initPayload(t):
     load["initialDecks"] = [drawDeck, faceDeck]
     initDecks()
 
-def playIsValid(t): # TODO no checks for validity. Any card is playable atm.
+def playIsValid(t):
+    # return True
     if len(load.decks[1]) == 0:
         return True
     choice = load.choice
@@ -97,23 +98,22 @@ def incrementScore(t):
     load.scores[load.currentPlayer-1]+=1
 
 def announceGameWinner(t):
-    print("\nPLAYER %s wins this game" % load.currentPlayer)
+    print(colors.negative("\nPLAYER %s wins this game" % load.currentPlayer))
     scores = ["player%s: %s" % (idx+1,score) for idx, score in enumerate(load.scores)]
-    print("Scoreboard:\n%s\n" % indentedlist(scores, indent=1))
+    print(colors.negative("Gameset Scoreboard:\n%s\n" % indentedlist(scores, indent=1)))
 
 def log(i):
     def printlog(s): print(colors.magenta(s))
-    printlog("###########################################################")
-    printlog("")
-    printlog("deck: %s" % load.decks[0])
-    printlog("pile: %s" % load.decks[1])
-    hands = ["player%s: %s" % (idx+1,hand) for idx, hand in enumerate(load.playerHands)]
-    printlog("hands: \n%s" % indentedlist(hands, indent=1))
+    printlog("# ###########################################################")
+    printlog("# deck: %s" % load.decks[0])
+    printlog("# pile: %s" % load.decks[1])
+    hands = ["# player%s: %s" % (idx+1,hand) for idx, hand in enumerate(load.playerHands)]
+    printlog("# hands: \n%s" % indentedlist(hands, indent=1))
     if 'choice' in load.keys():
-        printlog("choice: %s" % load.choice)
-    printlog("current player: %s" % load.currentPlayer)
-    printlog("starting player: %s" % load.startingPlayer)
-    printlog("scores: %s" % load.scores)
-    printlog("state path: " + load.path)
-    printlog("###########################################################\n")
+        printlog("# choice: %s" % load.choice)
+    printlog("# current player: %s" % load.currentPlayer)
+    printlog("# starting player: %s" % load.startingPlayer)
+    printlog("# scores: %s" % load.scores)
+    # printlog("state path: " + load.path)
+    printlog("# ###########################################################\n")
 ##############################

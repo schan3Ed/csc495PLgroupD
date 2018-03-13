@@ -28,6 +28,12 @@ def choose(prompt, options, autoplay=None):
     autoplay = autoplay or False
     if autoplay:
         choice = random.choice(options)
+        # BELOW WILL MIMIC PLAYER INTERATION WHILE AUTOPLAYING. USEFUL FOR GENERATING SCRIPTS FOR HW SUBMISSION.
+        # choice = options[0] # random.choice(options)
+        # print("%s (type a number then hit Enter)" % prompt)
+        # print("\n".join(["%i: %s" % (idx,option) for idx, option in enumerate(options)]))
+        # print("enter a number: 0")
+        # print(colors.negative("YOU CHOSE %s" % choice))
     else:
         choice = None
         while choice is None:
@@ -87,3 +93,7 @@ def isSameRank(c1, c2):
 
 def invalidMessage(t):
     print(colors.red("YOUR CHOICE IS INVALID"))
+
+    
+def announceGameSetWinner(t):
+    print(colors.negative("!!! GAMESET WINNER IS Player %s !!!" % str(load.scores.index(max(load.scores))+1)))
