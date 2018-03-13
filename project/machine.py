@@ -1,5 +1,4 @@
 # vim: set filetype=python ts=4 sw=2 sts=2 expandtab:
-import sys, re, traceback, time, random
 from base import *
 
 
@@ -47,7 +46,7 @@ class State(o):
         i._machine = machine
 
     def id(i):
-        return "%s('%s')" % (i.__class__.__name__, i.name)
+        return " => %s" % i.name
 
     def trans(i, guards, actions, destination):
         i._trans += [Transition(i, guards, actions, destination)]
@@ -74,7 +73,7 @@ class State(o):
         to use it's function instead of the universal one.
         """
         Machine.payload.count += 1
-        Machine.payload.path += "%s => " % i.id() # re.sub(r'[^a-zA-Z0-9_]*', '', i.name + ' '
+        Machine.payload.path += i.id() # re.sub(r'[^a-zA-Z0-9_]*', '', i.name + ' '
         if i.tag == NestedState.tag: 
             Machine.payload.path += '{ '
         e = State.FSMLimit
@@ -107,7 +106,7 @@ class State(o):
     def quit(i): # Returning indicates it's the last state of the machine
         return False
 
-    class FSMLimit(Exception): STEP_LIMIT = 500
+    class FSMLimit(Exception): STEP_LIMIT = 3000
 
 class NestedState(State):
     tag = "#"
@@ -149,11 +148,10 @@ class Machine(o):
        Returns old states if its an old name."""
     payload = o(count=0, path='')
 
-    def __init__(i, name, most=64):
+    def __init__(i, name):
         i.all = {}
         i.name = name
         i.start = None
-        i.most = most
 
     def isa(i, x):
         if isinstance(x, State):
@@ -177,7 +175,7 @@ class Machine(o):
         state.preparePayload()
         state._universalOnEntry()
         state.onEntry()
-        for _ in range(i.most):
+        while True:
             state = state.step()
             if state.quit():
                 break
@@ -191,7 +189,7 @@ class Machine(o):
     def true(i, s):     return True
 
 class SubMachine(Machine):
-    def __init__(i, name, parentMachine, most=64):
+    def __init__(i, name, parentMachine):
         super().__init__(name,most=most)
         i.parentMachine = parentMachine
 
