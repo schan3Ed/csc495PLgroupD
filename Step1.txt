@@ -1,0 +1,12 @@
+https://github.com/schan3Ed/csc495PLgroupD
+
+Team Members:
+	Connor Crothers
+	Edward Chan
+	Ahmad Husein
+
+Transcripts under project folder: 
+	bartok_output.txt
+	bartok_output2.txt
+	spades_output.txt
+	spades_output2.txt 
