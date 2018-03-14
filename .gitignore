@@ -7,3 +7,4 @@
 !Step0.txt
 !project
 !project/*
+*.pyc
