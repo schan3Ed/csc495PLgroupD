@@ -1,134 +1,99 @@
 # vim: set filetype=python ts=4 sw=2 sts=2 expandtab:
-import sys, re, traceback, time, random
+from base  import *
 from machine import *
 
 load = Machine.payload
 
 def initDecks():
     # clone from initial deck state
-    load["decks"] = [[card for card in deck] for deck in load["initialDecks"]]
+    load["decks"] = [shuffle([card for card in deck]) for deck in load["initialDecks"]]
 
-def transferCards(fromDeck, toDeck):
-    toDeck = toDeck + fromDeck
-    fromDeck = []
+def transferCards():
+    load.decks[0] = shuffle(load.decks[1][:-1])
+    load.decks[1]=[load.decks[1][-1]]
 
 def deal():
-    load["playersHand"]=[[] for i in range(4)]
-    d = load.decks[0]
-    for p in load.playersHand:
+    load["playerHands"]=[[] for i in range(4)]
+    for p in load.playerHands:
         for i in range(0,load.initialHandSize):
-            draw(d,p)
+            draw(p)
 
-def draw(deck, hand):
-    if len(deck[0]) == 0:
-        transferCards(deck[1],deck[0])
-    hand+=[deck[0]]
-    deck.remove(hand[-1])
+def draw(hand):
+    if len(load.decks[0]) == 0:
+        transferCards()
+    hand+=[load.decks[0][0]]
+    load.decks[0].remove(hand[-1])
 
 def choose(prompt, options, autoplay=None):
     autoplay = autoplay or False
     if autoplay:
         choice = random.choice(options)
+        # BELOW WILL MIMIC PLAYER INTERATION WHILE AUTOPLAYING. USEFUL FOR GENERATING SCRIPTS FOR HW SUBMISSION.
+        # choice = options[0] # random.choice(options)
+        # print("%s (type a number then hit Enter)" % prompt)
+        # print("\n".join(["%i: %s" % (idx,option) for idx, option in enumerate(options)]))
+        # print("enter a number: 0")
+        # print(colors.negative("YOU CHOSE %s" % choice))
     else:
-        print("%s (type a number then hit Enter)" % prompt)
-        print("\n".join(["%i: %s" % (idx,option) for idx, option in enumerate(options)]))
-        number = int(input("enter a number: "))
-        choice = options[number]
-        print("you chose %s" % choice)
+        choice = None
+        while choice is None:
+            try:
+                print("%s (type a number then hit Enter)" % prompt)
+                print("\n".join(["%i: %s" % (idx,option) for idx, option in enumerate(options)]))
+                number = int(input("enter a number: "))
+                if number < 0 or number >= len(options):
+                    raise IndexError("INVALID INPUT: that number is not an option")
+                choice = options[number]
+                print(colors.negative("YOU CHOSE %s" % choice))
+            except Exception as e:
+                invalidMessage(None)
     load["choice"]=choice
     return choice
-
-def initPayload(t):
-    load["startingPlayer"]=1
-    load["currentPlayer"]=1
-    load["numPlayers"]=4
-    load["initialHandSize"]=5
-    drawDeck = shuffle([str(rank) + suit for suit in ['h','s','d','c'] for rank in range(1,14)])
-    faceDeck = []
-    load["initialDecks"] = [drawDeck, faceDeck]
-    initDecks()
-
-def initPayloadSpades(t):
-    load["startingPlayer"]=1
-    load["currentPlayer"]=1
-    load["numPlayers"]=4
-    load["initialHandSize"]=13
-    drawDeck = shuffle([str(rank) + suit for suit in ['h','s','d','c'] for rank in range(1,14)])
-    faceDeck = []
-    load["initialDecks"] = [drawDeck, faceDeck]
-    load.points = [0 for i in range(0, load.numPlayers)]
-    initDecks()
-    deal()
-
-def cleanPile(t):
-    load.deck[1] = []
-
-def initGame(t):
-    load.currentPlayer=load.startingPlayer
-    load.scores = [0 for i in range(0, load.numPlayers)]
-    initDecks()
-    deal()
-
-def initGameSpade(t):
-    load.currentPlayer=load.startingPlayer
-    load.scores = [0 for i in range(0, load.numPlayers)]
 
 def rotateStartingPlayer(t):
     load.startingPlayer=load.startingPlayer%load.numPlayers+1
 
-def hand():
-    return load.playersHand[load.currentPlayer-1]
-
 def rotatePlayer(t):
-    load.currentPlayer=int(load.currentPlayer)%load.numPlayers+1
+    load.currentPlayer=load.currentPlayer%load.numPlayers+1
 
-def selectCardOrDraw(t):
-    options = hand() + ['draw']
-    return choose("play a card",options,autoplay=False) == 'draw'
-
-def playCardOrDraw(t):
+def play(t):
     card = load.choice
     if card == 'draw':
-        draw(load.decks[0], hand())
+        draw(hand())
     if card in hand():
         load.decks[1]+=[card]
         hand().remove(card)
-
-def chooseCard(t):
-    return choose("play a card",options,autoplay=False) == 'draw'
-    
-    card = load.choice
-    if card == 'draw':
-        draw(load.decks[0], hand())
-    if card in hand():
-        load.decks[1]+=[card]
-        hand().remove(card)
-
-def playIsValid(t): # TODO no checks for validity. Any card is playable atm.
-    return True
 
 def handIsEmpty(t):
     return len(hand()) == 0
 
-def announceWinner(t):
-    print("\nPLAYER %s wins this game" % load.currentPlayer)
-    scores = ["player%s: %s" % (idx,score) for idx, score in enumerate(load.playersHand)]
-    print("Updated Scoreboard:\n%s\n" % indentedlist(scores, indent=1))
+def allHandsEmpty(t):
+    for hand in load.playerHands:
+        if len(hand)!=0: return False
+    return True
 
-def incrementScore(t):
-    load.scores[load.currentPlayer-1]+=1
+def hand():
+    return load.playerHands[load.currentPlayer-1]
+
+def equalHands(t):
+    l = len(hand())
+    for h in load.playerHands:
+        if len(h) != l:
+            return False
+    return True
 
 def hasFive(t):
     return load.scores[load.currentPlayer-1]==5
 
-def invalidMessage(t):
-    print("YOUR CHOICE IS INVALID")
+def isSameSuit(c1, c2):
+    return bool(c1[-1]==c2[-1])
 
-def log(i):
-    print("\ndeck: %s" % load.decks[0])
-    print("pile: %s" % load.decks[1])
-    hands = ["player%s: %s" % (idx,hand) for idx, hand in enumerate(load.playersHand)]
-    print("hands: \n%s" % indentedlist(hands, indent=1))
-    if 'choice' in load.keys():
-        print("choice: %s" % load.choice)
-    print("current: %s\n" % load.currentPlayer)
+def isSameRank(c1, c2):
+    return bool(c1[:-1]==c2[:-1])
+
+def invalidMessage(t):
+    print(colors.red("YOUR CHOICE IS INVALID"))
+
+    
+def announceGameSetWinner(t):
+    print(colors.negative("!!! GAMESET WINNER IS Player %s !!!" % str(load.scores.index(max(load.scores))+1)))

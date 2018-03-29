@@ -1,5 +1,6 @@
 # vim: set filetype=python ts=4 sw=2 sts=2 expandtab:
 import sys, re, traceback, time, random
+import colors
 
 def rseed(seed=1):
     random.seed(int(seed))
@@ -13,9 +14,7 @@ def indentedlist(list, indent=0):
     indentStr = ''.join(["\t" for i in range(0,indent)])
     return indentStr + str("\n"+indentStr).join(map(lambda item:str(item), list))
 
-
 TRY = FAIL = 0
-
 
 def ok(f=None):
     global TRY, FAIL

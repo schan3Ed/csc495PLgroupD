@@ -1,0 +1,10 @@
+*
+!.gitignore
+!connorCrothers.py
+!edwardChan.py
+!nathanCrist.py
+!README.md
+!Step*.txt
+!project
+!project/*
+*.pyc
