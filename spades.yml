@@ -1,0 +1,53 @@
+-config:
+    Library:
+      - stdCard
+      - Spades
+    
+    Payload:
+      NumberOfPlayers: 4
+      CurrentPlayer: 1
+      PlayersScore: [0] * NumberOfPlayers
+      HighestScore: 0
+      FaceUp: []
+      Deck: []
+    
+    Gameset:
+      OnEntry:
+        - IntializeDeck
+
+      OnExit:
+        - LogScore
+    
+    Game:
+      OnEntry:
+        - ShuffleDeck
+        - CleanPile
+      
+      RestartGameIf:
+        - {HighestScore < 5}
+
+      OnExit:
+        - LogScore
+    
+    Round:
+      OnEntry:
+        - {StartingPlayer += 1}
+      
+      RestartRoundIf:
+        - None
+      
+      OnExit:
+        - UpdateScore
+    
+    PlayerTurns:
+      OnEntry:
+        - ShowHand
+        - ShowFaceUp
+        - PlayCard
+      
+      RestartPlayerTurnIf:
+        - InvalidCard 
+        - HandsNotEmpty
+      
+      OnExit:
+        - UpdateScore
