@@ -1,60 +1,18 @@
-def kv(d):
-    """Return a string of the dictionary,
-       keys in sorted order,
-       hiding any key that starts with '_'"""
-    return '(' + ', '.join(
-        ['%s: %s' % (k, d[k])                    for k in sorted(d.keys()) if k[0] != "_"] +
-        ['%s: %s' % (k, d[k].__class__.__name__) for k in sorted(d.keys()) if k[0] == "_"]
-        ) + ')'
-
-class Thing(object):
-    def __repr__(i):
-        return i.__class__.__name__ + kv(i.__dict__)
-
-
-class o(Thing):
-    def __init__(i, **dic): i.__dict__.update(dic)
-
-    def __getitem__(i, x):
-        return i.__dict__[x]
-
-    def __setitem__(i, key, value):
-        i.__dict__[str(key)] = value
-
-    def keys(i):
-        return i.__dict__.keys()
-
-    def values(i):
-        return i.__dict__.values()
-
-"""Recursively converts dictionaries into objects"""
-def convert(x):
-    if type(x) == dict:
-        for key,val in x.items():
-            x[key] = convert(val)
-        obj = o()
-        obj.__dict__.update(x)
-        return obj
-    if type(x) == list:
-        for idx, val in enumerate(x):
-            x[idx] = convert(val)
-    return x
-
 # vim: set filetype=python ts=4 sw=2 sts=2 expandtab:
 # yaml install instructions: Run pycharm as administrator, open terminal window/view, and execute "pip3 install pyyaml"
 import sys, re, traceback, time, random, json, yaml
-from base  import *
+from base import *
 from machine import *
 from actions import *
+import bartok
 import colors
 
-The = o()
-The['debugmode']=True
+debugmode=True
 def log(msg):
-    if The.debugmode:
+    if debugmode:
         print(colors.magenta(str(msg)))
 
-def parse(script):
+def precompile(script):
     script = json.dumps(yaml.load(script), sort_keys=True, indent=2)
     script = str(script).lower()
     log(script)
@@ -65,6 +23,13 @@ def parse(script):
         deck.contents = deck.contents.split(' ') if deck.contents!=None else []
     log(script)
     return script
+
+def compile(script):
+    return make(Machine("CUSTOM_GAME"),
+        lambda m,t,s: bartok.spec_bartok(m,t,s)
+    )
+
+
 
 
 script = """
@@ -84,14 +49,15 @@ PLAYERS :
     - player4
 """
 
-script = parse(script)
+script = precompile(script)
+compile(script).run()
 ##############################
 ########### RUNNER ###########
 ##############################
 def run():
     """wrapped try catch here so that it doesn't catch sub machines, only parent machine"""
     try:
-        make(Machine("CUSTOM_GAME"), spec_bartok).run()
+        make(Machine("CUSTOM_GAME"), compile).run()
     except State.FSMLimit as e:
         print(e.args[0].upper())
 ##############################
