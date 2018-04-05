@@ -58,7 +58,7 @@ def isa(k, seen=None):
             for x in isa(sub, seen):
                 yield x
 
-                class Thing(object):
+class Thing(object):
     def __repr__(i):
         return i.__class__.__name__ + kv(i.__dict__)
 
