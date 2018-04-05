@@ -30,8 +30,6 @@ def compile(script):
     )
 
 def run():
-
-
     script = """
     DECKS:
         -   name : face deck 

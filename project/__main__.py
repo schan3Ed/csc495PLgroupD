@@ -6,6 +6,4 @@ from base import *
 # ---------------------------------------
 if __name__ == "__main__":
     rseed()
-    # bartok.run()
-    # spades.run()
-    
+	compiler.run()    
