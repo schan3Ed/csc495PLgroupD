@@ -8,4 +8,3 @@
 !project
 !project/*
 *.pyc
-project/tokenizer.py
