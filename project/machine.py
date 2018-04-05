@@ -1,27 +1,6 @@
 # vim: set filetype=python ts=4 sw=2 sts=2 expandtab:
 from base import *
 
-
-class Thing(object):
-    def __repr__(i):
-        return i.__class__.__name__ + kv(i.__dict__)
-
-
-class o(Thing):
-    def __init__(i, **dic): i.__dict__.update(dic)
-
-    def __getitem__(i, x): 
-        return i.__dict__[x]
-
-    def __setitem__(i, key, value):
-        i.__dict__[str(key)] = value
-
-    def keys(i):
-        return i.__dict__.keys()
-
-    def values(i):
-        return i.__dict__.values()
-
 # ---------------------------------------
 def asLambda(i, txt):
     def methodsOf(i):

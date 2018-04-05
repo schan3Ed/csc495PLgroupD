@@ -57,3 +57,36 @@ def isa(k, seen=None):
         for sub in k.__subclasses__():
             for x in isa(sub, seen):
                 yield x
+
+                class Thing(object):
+    def __repr__(i):
+        return i.__class__.__name__ + kv(i.__dict__)
+
+
+class o(Thing):
+    def __init__(i, **dic): i.__dict__.update(dic)
+
+    def __getitem__(i, x): 
+        return i.__dict__[x]
+
+    def __setitem__(i, key, value):
+        i.__dict__[str(key)] = value
+
+    def keys(i):
+        return i.__dict__.keys()
+
+    def values(i):
+        return i.__dict__.values()
+        
+"""Recursively converts dictionaries into objects"""
+def convert(x):
+    if type(x) == dict:
+        for key,val in x.items():
+            x[key] = convert(val)
+        obj = o()
+        obj.__dict__.update(x)
+        return obj
+    if type(x) == list:
+        for idx, val in enumerate(x):
+            x[idx] = convert(val)
+    return x
