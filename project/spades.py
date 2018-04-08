@@ -47,19 +47,25 @@ def spec_spades(m, s, t):
 ##############################
 
 
+def gameWinner():
+    return load.points.index(max(load.points))+1
+
+def playIsValid(): # can restrict certain choices from being made, causing "invalid option" error, and requiring player to choose card again
+    return True
+
 ##############################
 ### ACTIONS/GUARDS/HELPERS ###
 ##############################
-def initRound(t):
+def initRound():
     load["roundStartingPlayer"] = ((load.startingPlayer-1+(load.initialHandSize-len(hand()))) % load.numPlayers) + 1
     load.currentPlayer = load.roundStartingPlayer
     
-def initGame(t):
+def initGame():
     load.points = [0 for i in range(0, load.numPlayers)]
     initDecks()
     deal()
 
-def initPayload(t):
+def initPayload():
     load["startingPlayer"]=1
     load["currentPlayer"]=1
     load["numPlayers"]=4
@@ -71,11 +77,11 @@ def initPayload(t):
     load["initialDecks"] = [drawDeck, faceDeck]
     initDecks()
 
-def chooseCard(t):
+def chooseCard():
     options = hand()
     return choose("Player%s, play a card"%load.currentPlayer,options,autoplay=False) == 'draw'
 
-def grantPoint(t):
+def grantPoint():
     roundwinner = roundWinner()
     load.points[roundwinner-1]+=1
     print("\n" + colors.negative("Player %s wins round." % (roundwinner)))
@@ -99,16 +105,10 @@ def cardValue(idx, card, roundCards):
     val+=int(card[:-1])
     return val
 
-def gameWinner():
-    return load.points.index(max(load.points))+1
-
-def playIsValid(t): # can restrict certain choices from being made, causing "invalid option" error, and requiring player to choose card again
-    return True
-
-def aboutToWinGameSet(t):
+def aboutToWinGameSet():
     return load.scores[gameWinner()-1] == 4
 
-def incrementScore(t):
+def incrementScore():
     load.scores[gameWinner()-1]+=1
 
 def log(i):

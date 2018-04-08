@@ -32,10 +32,11 @@ class State(o):
 
     def step(i):
         for t in i._trans:
-            if False not in [val for val in map(lambda f:f(t),t.guards)]:
+            if False not in [val for val in map(lambda f:f(),t.guards)]:
                 if t.actions is not None:
                     for action in t.actions:
-                        action(t)
+                        print(action.__name__)
+                        action()
                 i._universalOnExit()
                 i.onExit()
                 t.destination._universalPreparePayload()
@@ -162,10 +163,10 @@ class Machine(o):
         return state.onExit()
 
 
-    def unlikely(i, s): return random.random() < .25
-    def likely(i, s): return random.random() < .75
-    def maybe(i, s):    return random.random() < 0.5
-    def true(i, s):     return True
+    def unlikely(i): return random.random() < .25
+    def likely(i): return random.random() < .75
+    def maybe(i):    return random.random() < 0.5
+    def true(i):     return True
 
 class SubMachine(Machine):
     def __init__(i, name, parentMachine):

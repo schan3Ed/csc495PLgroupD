@@ -2,8 +2,8 @@
 from init import *
 from base import *
 
-
 # ---------------------------------------
 if __name__ == "__main__":
     rseed()
-	compiler.run()    
+    compiler.run()
+    # bartok.run()

@@ -46,44 +46,21 @@ def choose(prompt, options, autoplay=None):
                 choice = options[number]
                 print(colors.negative("YOU CHOSE %s" % choice))
             except Exception as e:
-                invalidMessage(None)
+                invalidMessage()
     load["choice"]=choice
     return choice
 
-def rotateStartingPlayer(t):
+def rotateStartingPlayer():
     load.startingPlayer=load.startingPlayer%load.numPlayers+1
 
-def rotatePlayer(t):
+def rotatePlayer():
     load.currentPlayer=load.currentPlayer%load.numPlayers+1
 
-def play(t):
-    card = load.choice
-    if card == 'draw':
-        draw(hand())
-    if card in hand():
-        load.decks[1]+=[card]
-        hand().remove(card)
 
-def handIsEmpty(t):
-    return len(hand()) == 0
-
-def allHandsEmpty(t):
-    for hand in load.playerHands:
-        if len(hand)!=0: return False
-    return True
 
 def hand():
     return load.playerHands[load.currentPlayer-1]
 
-def equalHands(t):
-    l = len(hand())
-    for h in load.playerHands:
-        if len(h) != l:
-            return False
-    return True
-
-def hasFive(t):
-    return load.scores[load.currentPlayer-1]==5
 
 def isSameSuit(c1, c2):
     return bool(c1[-1]==c2[-1])
@@ -91,9 +68,37 @@ def isSameSuit(c1, c2):
 def isSameRank(c1, c2):
     return bool(c1[:-1]==c2[:-1])
 
-def invalidMessage(t):
+
+
+def equalHands():
+    l = len(hand())
+    for h in load.playerHands:
+        if len(h) != l:
+            return False
+    return True
+
+def play():
+    card = load.choice
+    if card == 'draw':
+        draw(hand())
+    if card in hand():
+        load.decks[1]+=[card]
+        hand().remove(card)
+
+def handIsEmpty():
+    return len(hand()) == 0
+
+def allHandsEmpty():
+    for hand in load.playerHands:
+        if len(hand)!=0: return False
+    return True
+
+def hasFive():
+    return load.scores[load.currentPlayer-1]==5
+
+def invalidMessage():
     print(colors.red("YOUR CHOICE IS INVALID"))
 
     
-def announceGameSetWinner(t):
+def announceGameSetWinner():
     print(colors.negative("!!! GAMESET WINNER IS Player %s !!!" % str(load.scores.index(max(load.scores))+1)))

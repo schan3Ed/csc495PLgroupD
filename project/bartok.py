@@ -21,20 +21,23 @@ def run():
 ##############################
 def spec_bartok(m, s, t):
     start     = s("start|>"             )
-    newgame   = s("game starts"         )
-    startturn = s("player turn started" )           
-    endturn   = s("player turn ended"   )
-    wingame   = s("player wins"         )
-    endgame   = s("end game."           )
+    gamestart   = s("new game is starting"         )
+    turnstart = s("new turn is starting" )           
+    roundstart   = s("new round is starting"         )
+    end   = s("end game."           )
 
-    def logBeforeTurn():
-        print(colors.magenta("\n# AFTER PLAYER'S CHOICE BUT BEFORE CARD IS PLAYED"))
-        log(None)
-    def logAfterTurn():
-        print(colors.magenta("\n# AFTER CARD IS PLAYED"))
-        log(None)
-    startturn.onEntry = logBeforeTurn
-    endturn.onEntry = logAfterTurn
+    def chooseAndPlay():
+        chooseCard()
+        while not playIsValid():
+            invalidMessage()
+            chooseCard()
+        play()
+    turnstart.onEntry = chooseAndPlay
+    
+
+
+
+
 
     # all guards must be true before actions are executed and machine procedes to next state
     # all guards, actions, and transitions(for a given start state) are executed in order of appearance
@@ -48,30 +51,28 @@ def spec_bartok(m, s, t):
     # this is because the second transition's guards are only called if at least one of the previous transition's guards returned False 
 
   # t(FROM      , GAURDS        , ACTIONS                              , TO)
-    t(start     , [m.true]      , [initPayload ,initGame]              , newgame   ) # prepare game data and setup for new game
-    t(newgame   , [m.true]      , [chooseCard]                         , startturn ) # player starts turn by choosing a card from hand or drawing one
-    t(startturn , [playIsValid] , [play]                               , endturn   ) # if chosen card is valid choice based on game rules then play the card
-    t(startturn , [m.true]      , [invalidMessage, chooseCard]         , startturn ) # if chosen card isn't valid then display error and choose again
-    t(endturn   , [handIsEmpty] , [incrementScore, announceGameWinner] , wingame   ) # if player hand is empty then anounce game winner and give player 1 point
-    t(endturn   , [m.true]      , [rotatePlayer, chooseCard]           , startturn ) # if player hand is not empty then rotate player and have new player start turn by choosing a card from hand or drawing one 
-    t(wingame   , [hasFive]     , [announceGameSetWinner]              , endgame   ) # if player reaches 5 points then they win the gameset and gameset ends
-    t(wingame   , [m.true]      , [rotateStartingPlayer, initGame]     , newgame   ) # if player has less than 5 points then rotate starting player and setup new game
+    t(start     , [m.true]      , [initPayload ,initGame]              , gamestart   ) # prepare game data and setup for new game
+    t(gamestart   , [m.true]      , [chooseCard]                         , turnstart ) # player starts turn by choosing a card from hand or drawing one
+    t(turnstart   , [handIsEmpty] , [incrementScore, announceGameWinner] , roundstart   ) # if player hand is empty then anounce game winner and give player 1 point
+    t(turnstart   , [m.true]      , [rotatePlayer, chooseCard]           , turnstart ) # if player hand is not empty then rotate player and have new player start turn by choosing a card from hand or drawing one 
+    t(roundstart   , [hasFive]     , [announceGameSetWinner]              , end   ) # if player reaches 5 points then they win the gameset and gameset ends
+    t(roundstart   , [m.true]      , [rotateStartingPlayer, initGame]     , gamestart   ) # if player has less than 5 points then rotate starting player and setup new game
 ##############################
 
 
 ##############################
 ### ACTIONS/GUARDS/HELPERS ###
 ##############################
-def initGame(t):
+def initGame():
     load.currentPlayer=load.startingPlayer
     initDecks()
     deal()
 
-def chooseCard(t):
+def chooseCard():
     options = hand() + ['draw']
-    return choose("Player%s, play a card"%load.currentPlayer,options,autoplay=False) == 'draw'
+    return choose("Player%s, play a card"%load.currentPlayer,options, autoplay=False) == 'draw'
 
-def initPayload(t):
+def initPayload():
     load["startingPlayer"]=1
     load["currentPlayer"]=1
     load["numPlayers"]=4
@@ -82,7 +83,7 @@ def initPayload(t):
     load["initialDecks"] = [drawDeck, faceDeck]
     initDecks()
 
-def playIsValid(t):
+def playIsValid():
     # return True
     if len(load.decks[1]) == 0:
         return True
@@ -94,10 +95,10 @@ def playIsValid(t):
         return True
     return False
 
-def incrementScore(t):
+def incrementScore():
     load.scores[load.currentPlayer-1]+=1
 
-def announceGameWinner(t):
+def announceGameWinner():
     print(colors.negative("\nPLAYER %s wins this game" % load.currentPlayer))
     scores = ["player%s: %s" % (idx+1,score) for idx, score in enumerate(load.scores)]
     print(colors.negative("Gameset Scoreboard:\n%s\n" % indentedlist(scores, indent=1)))
