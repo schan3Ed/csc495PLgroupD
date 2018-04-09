@@ -60,7 +60,8 @@ class CustomEncoder(json.JSONEncoder):
     def default(i, obj):
         if isinstance(obj, JsonSerializable):
             return json.loads(obj.to_json())
-
+        if hasattr(obj, '__call__'):
+            return 'function ' + obj.__name__
         return json.JSONEncoder.default(i, obj)
 
 class JsonSerializable(object):

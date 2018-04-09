@@ -6,8 +6,12 @@ from machine import *
 from actions import *
 from bartok import *
 import colors
+import helpers
+
 load = Machine.payload
+
 debugmode = True
+
 def log(msg):
     if debugmode:
         print(colors.magenta(str(msg)))
@@ -28,10 +32,8 @@ def precompile(script):
 def compile(script):
     initload(script)
     specStr = buildspec(script)
-    exec(specStr, globals())
-    log(spec)
-    # return o(run=lambda:print('asdf'))
-    return make(Machine("CUSTOM_GAME"), spec_bartok)
+    exec(specStr, globals(), globals())
+    return make(Machine("CUSTOM_GAME"), globals()['spec'])
 
 # ###########################################################
 # deck: ['3d', '1s', '5d', '8c', '9h', '9c', '7s', '3c', '2c', '13c', '12s', '6s', '10s', '11h', '3s', '6c', '10d', '4s', '13s', '11c', '7c', '11d', '9s', '4h', '8h', '4c', '7d', '5s', '1d', '11s', '2d', '1h']
@@ -46,43 +48,46 @@ def compile(script):
 # scores: [0, 0, 0, 0]
 # ###########################################################
 
-def initload(script):pass
-    # if 'decks' in script.__dict__:
-    #     for deck in script.decks:
-    #         load[deck.name] = deck.contents
-    # if 'players' in script.__dict__:
-    #     for player in script.players:
-    #         load[player] = deck.contents
-    #         if 'player attributes' in script.__dict__:
-    #             load[player] = copy.deepcopy(script['player attributes'])
-    # if 'game attributes' in script.__dict__:
-    #         for key,val in script['game attributes'].items():
-    #             load[key] = val
+def initload(script):
+    if 'decks' in script.__dict__:
+        for deck in script.decks:
+            load[deck.name] = deck.contents
+    if 'players' in script.__dict__:
+        for player in script.players:
+            load[player] = deck.contents
+            if 'player attributes' in script.__dict__:
+                load[player] = copy.deepcopy(script['player attributes'])
+    if 'game attributes' in script.__dict__:
+            for key,val in script['game attributes'].items():
+                load[key] = val
 
 def buildspec(script):
-    return """def spec(m, s, t):
-        start      = s("start|>")
-        gamestart  = s("new game is starting")
-        turnstart  = s("new turn is starting")
-        roundstart = s("new round is starting")
-        end        = s("end game.")
+    return """
+def spec(m, s, t):
+    start      = s("start|>")
+    gamestart  = s("new game is starting")
+    turnstart  = s("new turn is starting")
+    roundstart = s("new round is starting")
+    end        = s("end game.")
 
-        def chooseAndPlay():
-            log(load)
+    def chooseAndPlay():
+        log(load)
+        chooseCard()
+        while not playIsValid():
+            invalidMessage()
             chooseCard()
-            while not playIsValid():
-                invalidMessage()
-                chooseCard()
-            play()
+        play()
 
-        turnstart.onEntry = chooseAndPlay
+    turnstart.onEntry = chooseAndPlay
 
-        t(start      , [m.true]     , [initPayload                         , initGame], gamestart            )  # prepare game data and setup for new game
-        t(gamestart  , [m.true]     , []                                   , turnstart                       )  # player starts turn by choosing a card from hand or drawing one
-        t(turnstart  , [handIsEmpty], [incrementScore, announceGameWinner] , roundstart                      )  # if player hand is empty then anounce game winner and give player 1 point
-        t(turnstart  , [m.true]     , [rotatePlayer]                       , turnstart                       )  # if player hand is not empty then rotate player and have new player start turn by choosing a card from hand or drawing one 
-        t(roundstart , [hasFive]    , [announceGameSetWinner]              , end                             )  # if player reaches 5 points then they win the gameset and gameset ends
-        t(roundstart , [m.true]     , [rotateStartingPlayer                , initGame], gamestart            )  # if player has less than 5 points then rotate starting player and setup new game
+    t(start, [m.true], [lambda:log(load), lambda:helpers.a__p01__X_is_now_X('starting player', 2), lambda:log(load)], end)
+
+    # t(start      , [m.true]     , [initPayload                         , initGame], gamestart            )  # prepare game data and setup for new game
+    # t(gamestart  , [m.true]     , []                                   , turnstart                       )  # player starts turn by choosing a card from hand or drawing one
+    # t(turnstart  , [handIsEmpty], [incrementScore, announceGameWinner] , roundstart                      )  # if player hand is empty then anounce game winner and give player 1 point
+    # t(turnstart  , [m.true]     , [rotatePlayer]                       , turnstart                       )  # if player hand is not empty then rotate player and have new player start turn by choosing a card from hand or drawing one
+    # t(roundstart , [hasFive]    , [announceGameSetWinner]              , end                             )  # if player reaches 5 points then they win the gameset and gameset ends
+    # t(roundstart , [m.true]     , [rotateStartingPlayer                , initGame], gamestart            )  # if player has less than 5 points then rotate starting player and setup new game
 """
 
 def run():

@@ -27,7 +27,7 @@ def spec_bartok(m, s, t):
     end   = s("end game."           )
 
     def chooseAndPlay():
-        log(load)
+        print(colors.magenta(load))
         chooseCard()
         while not playIsValid():
             invalidMessage()
@@ -104,18 +104,18 @@ def announceGameWinner():
     scores = ["player%s: %s" % (idx+1,score) for idx, score in enumerate(load.scores)]
     print(colors.negative("Gameset Scoreboard:\n%s\n" % indentedlist(scores, indent=1)))
 
-def log(i):
-    def printlog(s): print(colors.magenta(s))
-    printlog("# ###########################################################")
-    printlog("# deck: %s" % load.decks[0])
-    printlog("# pile: %s" % load.decks[1])
-    hands = ["# player%s: %s" % (idx+1,hand) for idx, hand in enumerate(load.playerHands)]
-    printlog("# hands: \n%s" % indentedlist(hands, indent=1))
-    if 'choice' in load.keys():
-        printlog("# choice: %s" % load.choice)
-    printlog("# current player: %s" % load.currentPlayer)
-    printlog("# starting player: %s" % load.startingPlayer)
-    printlog("# scores: %s" % load.scores)
-    # printlog("state path: " + load.path)
-    printlog("# ###########################################################\n")
-##############################
+# def log(i):
+#     def printlog(s): print(colors.magenta(s))
+#     printlog("# ###########################################################")
+#     printlog("# deck: %s" % load.decks[0])
+#     printlog("# pile: %s" % load.decks[1])
+#     hands = ["# player%s: %s" % (idx+1,hand) for idx, hand in enumerate(load.playerHands)]
+#     printlog("# hands: \n%s" % indentedlist(hands, indent=1))
+#     if 'choice' in load.keys():
+#         printlog("# choice: %s" % load.choice)
+#     printlog("# current player: %s" % load.currentPlayer)
+#     printlog("# starting player: %s" % load.startingPlayer)
+#     printlog("# scores: %s" % load.scores)
+#     # printlog("state path: " + load.path)
+#     printlog("# ###########################################################\n")
+#############################
