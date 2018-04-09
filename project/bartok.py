@@ -27,6 +27,7 @@ def spec_bartok(m, s, t):
     end   = s("end game."           )
 
     def chooseAndPlay():
+        log(load)
         chooseCard()
         while not playIsValid():
             invalidMessage()
@@ -50,13 +51,13 @@ def spec_bartok(m, s, t):
     # t(s1, [lambda t: not g1(t)], [a1], s2)
     # this is because the second transition's guards are only called if at least one of the previous transition's guards returned False 
 
-  # t(FROM      , GAURDS        , ACTIONS                              , TO)
-    t(start     , [m.true]      , [initPayload ,initGame]              , gamestart   ) # prepare game data and setup for new game
-    t(gamestart   , [m.true]      , [chooseCard]                         , turnstart ) # player starts turn by choosing a card from hand or drawing one
-    t(turnstart   , [handIsEmpty] , [incrementScore, announceGameWinner] , roundstart   ) # if player hand is empty then anounce game winner and give player 1 point
-    t(turnstart   , [m.true]      , [rotatePlayer, chooseCard]           , turnstart ) # if player hand is not empty then rotate player and have new player start turn by choosing a card from hand or drawing one 
-    t(roundstart   , [hasFive]     , [announceGameSetWinner]              , end   ) # if player reaches 5 points then they win the gameset and gameset ends
-    t(roundstart   , [m.true]      , [rotateStartingPlayer, initGame]     , gamestart   ) # if player has less than 5 points then rotate starting player and setup new game
+  # t(FROM       , GAURDS        , ACTIONS                              , TO)
+    t(start      , [m.true]      , [initPayload ,initGame]              , gamestart    ) # prepare game data and setup for new game
+    t(gamestart  , [m.true]      , []                                   , turnstart    ) # player starts turn by choosing a card from hand or drawing one
+    t(turnstart  , [handIsEmpty] , [incrementScore, announceGameWinner] , roundstart   ) # if player hand is empty then anounce game winner and give player 1 point
+    t(turnstart  , [m.true]      , [rotatePlayer]                       , turnstart    ) # if player hand is not empty then rotate player and have new player start turn by choosing a card from hand or drawing one 
+    t(roundstart , [hasFive]     , [announceGameSetWinner]              , end          ) # if player reaches 5 points then they win the gameset and gameset ends
+    t(roundstart , [m.true]      , [rotateStartingPlayer, initGame]     , gamestart    ) # if player has less than 5 points then rotate starting player and setup new game
 ##############################
 
 

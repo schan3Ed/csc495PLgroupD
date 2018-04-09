@@ -1,5 +1,5 @@
 # vim: set filetype=python ts=4 sw=2 sts=2 expandtab:
-import sys, re, traceback, time, random
+import sys, re, traceback, time, random, json, copy
 import colors
 
 def rseed(seed=1):
@@ -37,17 +37,6 @@ def shuffle(lst):
 def contains(all, some):
     return all.find(some) != -1
 
-
-def kv(d):
-    """Return a string of the dictionary,
-       keys in sorted order,
-       hiding any key that starts with '_'"""
-    return '(' + ', '.join(
-        ['%s: %s' % (k, d[k])                    for k in sorted(d.keys()) if k[0] != "_"] +
-        ['%s: %s' % (k, d[k].__class__.__name__) for k in sorted(d.keys()) if k[0] == "_"]
-        ) + ')'
-
-
 def isa(k, seen=None):
     assert isinstance(k, type), "superclass must be 'object'"
     seen = seen or set()
@@ -58,30 +47,57 @@ def isa(k, seen=None):
             for x in isa(sub, seen):
                 yield x
 
-class Thing(object):
+def kv(d):
+    """Return a string of the dictionary,
+       keys in sorted order,
+       hiding any key that starts with '_'"""
+    return '(' + ', '.join(
+        ['%s: %s' % (k, d[k])                    for k in sorted(d.keys()) if k[0] != "_"] +
+        ['%s: %s' % (k, d[k].__class__.__name__) for k in sorted(d.keys()) if k[0] == "_"]
+        ) + ')'
+
+class CustomEncoder(json.JSONEncoder):
+    def default(i, obj):
+        if isinstance(obj, JsonSerializable):
+            return json.loads(obj.to_json())
+
+        return json.JSONEncoder.default(i, obj)
+
+class JsonSerializable(object):
+    def to_json(i):
+        return json.dumps(i.__dict__, sort_keys=True, indent=2, cls = CustomEncoder)
+
     def __repr__(i):
-        return i.__class__.__name__ + kv(i.__dict__)
+        return i.to_json()
 
+    def __str__(i):
+        return i.to_json()
 
-class o(Thing):
+class o(JsonSerializable):
     def __init__(i, **dic): i.__dict__.update(dic)
 
-    def __getitem__(i, x): 
+    def __getitem__(i, x):
         return i.__dict__[x]
 
     def __setitem__(i, key, value):
         i.__dict__[str(key)] = value
+
+    def __iter__(i):
+        return iter(i.__dict__)
+
+    def items(i):
+        return i.__dict__.items()
 
     def keys(i):
         return i.__dict__.keys()
 
     def values(i):
         return i.__dict__.values()
-        
+
 """Recursively converts dictionaries into objects"""
 def convert(x):
     if type(x) == dict:
-        for key,val in x.items():
+        for key, val in x.items():
             x[key] = convert(val)
         obj = o()
         obj.__dict__.update(x)
@@ -90,3 +106,10 @@ def convert(x):
         for idx, val in enumerate(x):
             x[idx] = convert(val)
     return x
+
+class Card(o):
+    def __init__(self, name, suit, rank, fun=None):
+        self.fun = fun or (lambda: None)
+        self.name = str(name)
+        self.suit = str(suit)
+        self.rank = str(rank)

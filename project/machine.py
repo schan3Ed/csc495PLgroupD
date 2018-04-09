@@ -52,12 +52,12 @@ class State(o):
         call to preparePayload. Overriding will cause that state
         to use it's function instead of the universal one.
         """
-        Machine.payload.count += 1
+        Machine.payload.system.count += 1
         Machine.payload.path += i.id() # re.sub(r'[^a-zA-Z0-9_]*', '', i.name + ' '
         if i.tag == NestedState.tag: 
             Machine.payload.path += '{ '
         e = State.FSMLimit
-        if Machine.payload.count > e.STEP_LIMIT: 
+        if Machine.payload.system.count > e.STEP_LIMIT: 
             raise e("Cannot exceed %s executed states" % e.STEP_LIMIT)
 
     def _universalOnEntry(i):
@@ -126,7 +126,7 @@ class Machine(o):
     """Maintains a set of named states.
        Creates new states if its a new name.
        Returns old states if its an old name."""
-    payload = o(count=0, path='')
+    payload = o(system=o(count=0), path='')
 
     def __init__(i, name):
         i.all = {}
