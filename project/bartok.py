@@ -21,9 +21,9 @@ def run():
 ##############################
 def spec_bartok(m, s, t):
     start     = s("start|>"             )
-    gamestart   = s("new game is starting"         )
-    turnstart = s("new turn is starting" )           
-    roundstart   = s("new round is starting"         )
+    gamestart   = s("new game is started"         )
+    turnstart = s("new turn is started" )           
+    roundstart   = s("new round is started"         )
     end   = s("end game."           )
 
     def chooseAndPlay():
