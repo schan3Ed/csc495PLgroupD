@@ -20,10 +20,8 @@ def precompile(script):
     script = json.dumps(yaml.load(script), sort_keys=True, indent=2)
     script = str(script).lower()
     script = re.sub(r'\bnull\b', '[]', script)
-    # log(script)
     script = json.loads(script)
     script = convert(script)
-    # print(type(script.decks[0]))
     for deck in script.decks:
         if not isinstance(deck.contents, list):
             deck.contents = deck.contents.split(' ')
@@ -34,7 +32,8 @@ def compile(script):
     specStr = buildspec(script)
     exec(specStr, globals(), globals())
     return make(Machine("CUSTOM_GAME"), globals()['spec'])
-
+    
+# OLD PAYLOAD STRUCTURE (log load during runtime to see new payload structure)
 # ###########################################################
 # deck: ['3d', '1s', '5d', '8c', '9h', '9c', '7s', '3c', '2c', '13c', '12s', '6s', '10s', '11h', '3s', '6c', '10d', '4s', '13s', '11c', '7c', '11d', '9s', '4h', '8h', '4c', '7d', '5s', '1d', '11s', '2d', '1h']
 # pile: []
@@ -80,7 +79,7 @@ def spec(m, s, t):
 
     turnstart.onEntry = chooseAndPlay
 
-    t(start, [m.true], [lambda:log(load), lambda:helpers.a__p01__X_is_now_X('starting player', 2), lambda:log(load)], end)
+    t(start, [m.true], [lambda:log(load), lambda:helpers.buildAction('starting player is now 2'), lambda:log(load)], end)
 
     # t(start      , [m.true]     , [initPayload                         , initGame], gamestart            )  # prepare game data and setup for new game
     # t(gamestart  , [m.true]     , []                                   , turnstart                       )  # player starts turn by choosing a card from hand or drawing one
