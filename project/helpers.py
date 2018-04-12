@@ -16,9 +16,10 @@ def actions(): return convert({k : v for k,v in inspect.getmembers(helpers, insp
 # re.sub https://stackoverflow.com/questions/31005138/replace-regex-matches-in-a-string-with-items-from-a-list-in-order
 
 def buildAction(text):
-	for key,val in actions().items():
+	for key,func in actions().items():
 		if matchesFunction(text,key):
-			val(getArgs(text,key))
+			func(getArgs(text,key))
+	
 
 def matchesFunction(text,fString):
 	if re.compile("^"+getFRegStr(fString)+"$").match(text) is not None:

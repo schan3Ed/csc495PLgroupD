@@ -27,7 +27,7 @@ def spec_bartok(m, s, t):
     end   = s("end game."           )
 
     def chooseAndPlay():
-        print(colors.magenta(load))
+        print(colors.magenta(str(load)))
         chooseCard()
         while not playIsValid():
             invalidMessage()

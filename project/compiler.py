@@ -32,6 +32,7 @@ def compile(script):
     specStr = buildspec(script)
     exec(specStr, globals(), globals())
     return make(Machine("CUSTOM_GAME"), globals()['spec'])
+    # return make(Machine("CUSTOM_GAME"), spec_bartok)
     
 # OLD PAYLOAD STRUCTURE (log load during runtime to see new payload structure)
 # ###########################################################
@@ -67,7 +68,7 @@ def spec(m, s, t):
     gamestart  = s("new game is started")
     turnstart  = s("new turn is started")
     roundstart = s("new round is started")
-    end        = s("end game.")
+    end        = s("game is finished.")
 
     def chooseAndPlay():
         log(load)
@@ -81,12 +82,12 @@ def spec(m, s, t):
 
     t(start, [m.true], [lambda:log(load), lambda:helpers.buildAction('starting player is now 2'), lambda:log(load)], end)
 
-    # t(start      , [m.true]     , [initPayload                         , initGame], gamestart            )  # prepare game data and setup for new game
-    # t(gamestart  , [m.true]     , []                                   , turnstart                       )  # player starts turn by choosing a card from hand or drawing one
-    # t(turnstart  , [handIsEmpty], [incrementScore, announceGameWinner] , roundstart                      )  # if player hand is empty then anounce game winner and give player 1 point
-    # t(turnstart  , [m.true]     , [rotatePlayer]                       , turnstart                       )  # if player hand is not empty then rotate player and have new player start turn by choosing a card from hand or drawing one
-    # t(roundstart , [hasFive]    , [announceGameSetWinner]              , end                             )  # if player reaches 5 points then they win the gameset and gameset ends
-    # t(roundstart , [m.true]     , [rotateStartingPlayer                , initGame], gamestart            )  # if player has less than 5 points then rotate starting player and setup new game
+    # t(start      , [m.true]     , [initPayload, initGame]              , gamestart  )  # prepare game data and setup for new game
+    # t(gamestart  , [m.true]     , []                                   , turnstart  )  # player starts turn by choosing a card from hand or drawing one
+    # t(turnstart  , [handIsEmpty], [incrementScore, announceGameWinner] , roundstart )  # if player hand is empty then anounce game winner and give player 1 point
+    # t(turnstart  , [m.true]     , [rotatePlayer]                       , turnstart  )  # if player hand is not empty then rotate player and have new player start turn by choosing a card from hand or drawing one
+    # t(roundstart , [hasFive]    , [announceGameSetWinner]              , end        )  # if player reaches 5 points then they win the gameset and gameset ends
+    # t(roundstart , [m.true]     , [rotateStartingPlayer, initGame]     , gamestart  )  # if player has less than 5 points then rotate starting player and setup new game
 """
 
 def run():
@@ -109,9 +110,32 @@ def run():
         score : 0
         hand :
     GAME ATTRIBUTES:
-        current player : 1
-        starting player: 1
+        current player : player1
+        starting player: player1
+    RULES:
+        -   when new game is started
+            then for every player transfer 5 cards from draw deck to player hand
+            so new turn is started
+        -   when new turn is started
+            if hand of current player is empty
+            then increment score of current player
+            then announce "current player has won"
+            so new round is started
+        -   when new turn is started
+            unless hand of current player is empty
+            then rotate current player
+            so new turn is started
+        -   when new round is started
+            if for any player size of hand of player is five
+            then announce "player with highest score wins"
+            so game is finished
+        -   when new round is started
+            unless size of hand of any player is five
+            then rotate starting player
+            then for every player reset hand of player
     """
+    # an alternative to a "X_of_X" or "size_of_X" helper, I may match that same function name to the input "X's X"
+    # so a function like size of X can still match against the input "size of hand" AND "hand's size"
 
     script = precompile(script)
     compile(script).run()
