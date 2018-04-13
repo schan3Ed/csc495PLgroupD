@@ -66,8 +66,8 @@ class State(o):
         call to onEntry. Overriding will cause that state
         to use it's function instead of the universal one.
         """
-        # print("%s  => " % i.name, end='') # DEBUG
-        pass
+        print("%s  => " % i.name, end='') # DEBUG
+        # pass
 
     def _universalOnExit(i):
         """Do not override.

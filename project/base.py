@@ -66,7 +66,10 @@ class CustomEncoder(json.JSONEncoder):
 
 class JsonSerializable(object):
     def to_json(i):
-        return json.dumps(i.__dict__, sort_keys=True, indent=2, cls = CustomEncoder)
+        try:
+            return json.dumps(i.__dict__, sort_keys=True, indent=2, cls = CustomEncoder)
+        except Exception:
+            return str(i.__dict__)
 
     def __repr__(i):
         return i.to_json()
@@ -95,18 +98,24 @@ class o(JsonSerializable):
     def values(i):
         return i.__dict__.values()
 
-"""Recursively converts dictionaries into objects"""
-def convert(x):
-    if type(x) == dict:
-        for key, val in x.items():
-            x[key] = convert(val)
-        obj = o()
-        obj.__dict__.update(x)
-        return obj
-    if type(x) == list:
-        for idx, val in enumerate(x):
-            x[idx] = convert(val)
-    return x
+    def sort(i):
+        i.__dict__ = sorted(i.__dict__)
+        return i
+
+    """Recursively converts dictionaries into o"""
+    @staticmethod
+    def convert(x):
+        if type(x) == dict:
+            for key, val in x.items():
+                x[key] = o.convert(val)
+            obj = o()
+            obj.__dict__.update(x)
+            return obj
+        if type(x) == list:
+            for idx, val in enumerate(x):
+                x[idx] = o.convert(val)
+        return x
+        
 
 class Card(o):
     def __init__(self, name, suit, rank, fun=None):

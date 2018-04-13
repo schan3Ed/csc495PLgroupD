@@ -16,12 +16,17 @@ def log(msg):
     if debugmode:
         print(colors.magenta(str(msg)))
 
+def yaml2json(text):
+    text = json.dumps(yaml.load(script), sort_keys=True, indent=2)
+    text = json.loads(text)
+    return text
+
 def precompile(script):
     script = json.dumps(yaml.load(script), sort_keys=True, indent=2)
     script = str(script).lower()
     script = re.sub(r'\bnull\b', '[]', script)
     script = json.loads(script)
-    script = convert(script)
+    script = o.convert(script)
     for deck in script.decks:
         if not isinstance(deck.contents, list):
             deck.contents = deck.contents.split(' ')
@@ -62,16 +67,26 @@ def initload(script):
                 load[key] = val
 
 def buildspec(script):
-    return """
-def spec(m, s, t):
-    start      = s("start|>")
-    gamestart  = s("new game is started")
-    turnstart  = s("new turn is started")
-    roundstart = s("new round is started")
-    end        = s("game is finished.")
+    name2instance = o.convert({
+        "starting"             : "start",
+        "new game is started"  : "gamestart",
+        "new turn is started"  : "turnstart",
+        "new round is started" : "roundstart",
+        "game is finished"     : "end"
+    })
 
+    spec = """
+def spec(m, s, t):"""
+    
+    for identifier, instanceName in name2instance.items():
+        if instanceName=='start': identifier = "%s|>"%identifier
+        if instanceName=='end'  : identifier = "%s." %identifier
+        spec+="""
+    %s = s("%s")""" % (instanceName, identifier)
+    
+    spec+= """
     def chooseAndPlay():
-        log(load)
+        # log(load)
         chooseCard()
         while not playIsValid():
             invalidMessage()
@@ -79,63 +94,40 @@ def spec(m, s, t):
         play()
 
     turnstart.onEntry = chooseAndPlay
+    """
 
-    t(start, [m.true], [lambda:log(load), lambda:helpers.buildAction('starting player is now 2'), lambda:log(load)], end)
-
-    # t(start      , [m.true]     , [initPayload, initGame]              , gamestart  )  # prepare game data and setup for new game
-    # t(gamestart  , [m.true]     , []                                   , turnstart  )  # player starts turn by choosing a card from hand or drawing one
-    # t(turnstart  , [handIsEmpty], [incrementScore, announceGameWinner] , roundstart )  # if player hand is empty then anounce game winner and give player 1 point
-    # t(turnstart  , [m.true]     , [rotatePlayer]                       , turnstart  )  # if player hand is not empty then rotate player and have new player start turn by choosing a card from hand or drawing one
-    # t(roundstart , [hasFive]    , [announceGameSetWinner]              , end        )  # if player reaches 5 points then they win the gameset and gameset ends
-    # t(roundstart , [m.true]     , [rotateStartingPlayer, initGame]     , gamestart  )  # if player has less than 5 points then rotate starting player and setup new game
-"""
+    for rule in script.rules:
+        transitionArgs = re.sub(r"\b(when|if|then|unless|so)\b", "-\\1:", rule).split('-')[1:]
+        transitionArgs = [arg.split(':') for arg in transitionArgs]
+        transitionArgs = [o(type=arg[0].strip(), text=arg[1].strip()) for arg in transitionArgs]
+        startTransitionState = [arg.text for arg in transitionArgs if arg.type=='when'][0] # should only be one of them
+        endTransitionState   = [arg.text for arg in transitionArgs if arg.type=='so'][0] # should only be one of them
+        startTransitionState = name2instance[startTransitionState]
+        endTransitionState   = name2instance[endTransitionState]
+        guards=[]
+        for guardtext in [arg.text for arg in transitionArgs if arg.type=='if']:
+            guards+=["lambda:helpers.execGuard(\"%s\")"%guardtext]
+        for guardtext in [arg.text for arg in transitionArgs if arg.type=='unless']:
+            guards+=["lambda:not helpers.execGuard(\"%s\")"%guardtext]
+        actions=[]
+        for actiontext in [arg.text for arg in transitionArgs if arg.type=='then']:
+            actions+=["lambda:helpers.execAction(\"%s\")"%actiontext]
+        if len(guards) is 0:
+            guards=["m.true"]
+        actions="[%s]"%",".join(actions)
+        guards ="[%s]"%",".join(guards)
+        # and finally... create the transition
+        spec+="""
+    t(%s,%s,%s,%s)""" % (startTransitionState, guards, actions, endTransitionState)
+    return spec
 
 def run():
-    script = """
-    DECKS:
-        -   name : face deck 
-            contents : 1h 2h 3h 4h 5h 6h 7h 8h 9h 10h 11h 12h 13h 1s 2s 3s 4s 5s 6s 7s 8s 9s 10s 11s 12s 13s 1d 2d 3d 4d 5d 6d 7d 8d 9d 10d 11d 12d 13d 1c 2c 3c 4c 5c 6c 7c 8c 9c 10c 11c 12c 13c
-            shuffle : yes
-            hidden: yes
-        -   name : draw deck
-            contents :
-            shuffle : no
-            hidden : no
-    PLAYERS:
-        - player1
-        - player2
-        - player3
-        - player4
-    PLAYER ATTRIBUTES:
-        score : 0
-        hand :
-    GAME ATTRIBUTES:
-        current player : player1
-        starting player: player1
-    RULES:
-        -   when new game is started
-            then for every player transfer 5 cards from draw deck to player hand
-            so new turn is started
-        -   when new turn is started
-            if hand of current player is empty
-            then increment score of current player
-            then announce "current player has won"
-            so new round is started
-        -   when new turn is started
-            unless hand of current player is empty
-            then rotate current player
-            so new turn is started
-        -   when new round is started
-            if for any player size of hand of player is five
-            then announce "player with highest score wins"
-            so game is finished
-        -   when new round is started
-            unless size of hand of any player is five
-            then rotate starting player
-            then for every player reset hand of player
-    """
+    script=""
+    with open('test_script.yaml', 'r') as file:
+        script=file.read()#.replace('\n', '')
     # an alternative to a "X_of_X" or "size_of_X" helper, I may match that same function name to the input "X's X"
     # so a function like size of X can still match against the input "size of hand" AND "hand's size"
 
     script = precompile(script)
+    print(compile(script).__dict__)
     compile(script).run()
