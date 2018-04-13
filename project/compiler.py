@@ -129,5 +129,4 @@ def run():
     # so a function like size of X can still match against the input "size of hand" AND "hand's size"
 
     script = precompile(script)
-    print(compile(script).__dict__)
     compile(script).run()
