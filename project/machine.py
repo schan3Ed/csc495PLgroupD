@@ -2,6 +2,16 @@
 from base import *
 
 # ---------------------------------------
+
+debugmode = True
+allowloadlogging = True
+def log(msg):
+    if debugmode:
+        if msg is not Machine.payload or allowloadlogging:
+            print(colors.magenta(str(msg)))
+        else:
+            print(colors.magenta('<<<< log hit >>>>'))
+
 def asLambda(i, txt):
     def methodsOf(i):
         return [s for s in i.__dir__() if s[0] is not "_"]
@@ -33,9 +43,8 @@ class State(o):
     def step(i):
         for t in i._trans:
             if False not in [val for val in map(lambda f:f(),t.guards)]:
-                if t.actions is not None:
+                if t.actions is not None and len(t.actions)>0:
                     for action in t.actions:
-                        print(action.__name__)
                         action()
                 i._universalOnExit()
                 i.onExit()
@@ -66,8 +75,8 @@ class State(o):
         call to onEntry. Overriding will cause that state
         to use it's function instead of the universal one.
         """
-        print("%s  => " % i.name, end='') # DEBUG
-        # pass
+        # print("%s  => " % i.name, end='') # DEBUG
+        pass
 
     def _universalOnExit(i):
         """Do not override.
@@ -168,6 +177,14 @@ class Machine(o):
     def maybe(i):    return random.random() < 0.5
     def true(i):     return True
 
+    class PayloadItem(o):
+        def get(i):
+            if 'obj' in i: return i.obj[i.key]
+            else:          return i.key
+        def set(i,val):
+            if 'obj' in i and 'key' in i:
+                i.obj[i.key]=val
+
 class SubMachine(Machine):
     def __init__(i, name, parentMachine):
         super().__init__(name,most=most)
@@ -177,6 +194,5 @@ class SubMachine(Machine):
 def make(m, fun):
     fun(m, m.state, m.trans)
     return m
-
 
 # END>

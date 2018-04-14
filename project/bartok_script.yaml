@@ -1,9 +1,9 @@
 DECKS:
-    -   name : face deck 
+    -   name : draw deck 
         contents : 1h 2h 3h 4h 5h 6h 7h 8h 9h 10h 11h 12h 13h 1s 2s 3s 4s 5s 6s 7s 8s 9s 10s 11s 12s 13s 1d 2d 3d 4d 5d 6d 7d 8d 9d 10d 11d 12d 13d 1c 2c 3c 4c 5c 6c 7c 8c 9c 10c 11c 12c 13c
         shuffle : yes
         hidden: yes
-    -   name : draw deck
+    -   name : face deck
         contents :
         shuffle : no
         hidden : no
@@ -19,8 +19,12 @@ GAME ATTRIBUTES:
     current player : player1
     starting player: player1
 RULES:
+    -   when starting
+        so new game is started
     -   when new game is started
-        then for every player transfer 5 cards from draw deck to player hand
+        then log
+        then for every player transfer 5 cards from draw deck to hand of player
+        then log
         so new turn is started
     -   when new turn is started
         if hand of current player is empty
@@ -35,7 +39,7 @@ RULES:
         if for any player size of hand of player is five
         then announce "player with highest score wins"
         so game is finished
-    -   when new round is started
-        unless size of hand of any player is five
-        then rotate starting player
-        then for every player reset hand of player
+    # -   when new round is started
+    #     unless size of hand of any player is five
+    #     then rotate starting player
+    #     then for every player reset hand of player

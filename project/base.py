@@ -67,7 +67,7 @@ class CustomEncoder(json.JSONEncoder):
 class JsonSerializable(object):
     def to_json(i):
         try:
-            return json.dumps(i.__dict__, sort_keys=True, indent=2, cls = CustomEncoder)
+            return json.dumps(i.__dict__, sort_keys=True, indent=8, cls = CustomEncoder)
         except Exception:
             return str(i.__dict__)
 
@@ -78,10 +78,13 @@ class JsonSerializable(object):
         return i.to_json()
 
 class o(JsonSerializable):
-    def __init__(i, **dic): i.__dict__.update(dic)
+    def __init__(i, *args, **dic):
+        for arg in args:
+            i.update(arg)
+        i.update(dic)
 
     def __getitem__(i, x):
-        return i.__dict__[x]
+        return i.__dict__[str(x)]
 
     def __setitem__(i, key, value):
         i.__dict__[str(key)] = value
@@ -89,8 +92,20 @@ class o(JsonSerializable):
     def __iter__(i):
         return iter(i.__dict__)
 
+    def update(i,val):
+        if type(val) is o:
+            return i.__dict__.update(val.__dict__)
+        else:
+            return i.__dict__.update(val)
+
     def items(i):
         return i.__dict__.items()
+
+    def itemsbykey(i):
+        return sorted(i.items())
+
+    def itemsbyvalue(i):
+        sorted(i.items(),key=lambda item:item[1])
 
     def keys(i):
         return i.__dict__.keys()
@@ -98,9 +113,8 @@ class o(JsonSerializable):
     def values(i):
         return i.__dict__.values()
 
-    def sort(i):
-        i.__dict__ = sorted(i.__dict__)
-        return i
+    def sorted(i):
+        sorted(i.__dict__)
 
     """Recursively converts dictionaries into o"""
     @staticmethod
@@ -115,7 +129,6 @@ class o(JsonSerializable):
             for idx, val in enumerate(x):
                 x[idx] = o.convert(val)
         return x
-        
 
 class Card(o):
     def __init__(self, name, suit, rank, fun=None):
