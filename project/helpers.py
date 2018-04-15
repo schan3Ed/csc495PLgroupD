@@ -176,7 +176,7 @@ def a__p10__increment_X(args):
 
 def a__p10__rotate_X(args): 
     x = getExpr(args[0]) 
-    return lambda: x.set((x.get() += 1) % load["numPlayers"])
+    return lambda: x.set((x.get() += 1) % len(the.script.players))
     # X will be a number from 0 to numPlayers-1... increment it but set back to zero if equal to numPlayers (not a global value... must count players field from compiled script)
 
 def a__p10__X_is_now_X(args):
