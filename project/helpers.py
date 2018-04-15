@@ -135,7 +135,7 @@ def a__p05__transfer_X_from_X_to_X(args): # transfers the top x1 number of items
     x3 = getExpr(x3)
     def fun():
         for i in range(x1.get()):
-            x3.get().append(x2.get().pop())
+            x3.get().append(x2.get().pop()) # lists are mutable so x3.get() is okay. in most cases, x3.set would be necessary to update the actual payload value
     return fun
 
 def a__p05__increment_X(args): 
