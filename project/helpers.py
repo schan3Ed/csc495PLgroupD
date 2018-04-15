@@ -103,11 +103,11 @@ def g__p01__for_any_player_X(args): # similar to for_every_player guard, but ret
     playerGuards = [buildGuard(guard) for guard in playerGuards]
     return lambda: True in [guard() for guard in playerGuards]
 
-def g__p06__X_is_X(args):
-    x1,x2 = args
-    x1 = getExpr(x1)
-    x2 = getExpr(x2)
-    return lambda:x1.get()==x2.get()
+def g__p03__X_or_X(args):
+    pass
+
+def g__p04__X_and_X(args):
+    pass
 
 
 def g__p05__X_is_true(args):
@@ -119,6 +119,12 @@ def g__p05__X_is_empty(args):
     x = getExpr(args[0])
     return lambda: len(x) == 0
 
+def g__p06__X_is_X(args):
+    x1,x2 = args
+    x1 = getExpr(x1)
+    x2 = getExpr(x2)
+    return lambda:x1.get()==x2.get()
+
 
 def a__p01__for_every_player_X(args): # builds and calls an action to perform once for every player by calling buildAction and providing one version of the text each time, but with the word 'player' replaced with player names like 'player1' 'player2' etc
     x1=args[0]
@@ -126,9 +132,30 @@ def a__p01__for_every_player_X(args): # builds and calls an action to perform on
     playerActions = [buildAction(action) for action in playerActions]
     return lambda:[action() for action in playerActions]
 
+# x1 is player
+# x2 is draw deck
+# x3 is where card is drawn into. likely player's hand
+# x4 are the player's card options. likely the players hand
+# x5 is where the chosen card is placed. ie 'face deck'
+# x6 is the condition for a valid card. if false after player choice, reprompt user for choice
+def a__p04__X_draws_from_X_into_X_or_plays_from_X_into_X_where_X(args):
+    pass
 
+# same as returned function below, but without condition
+def a__p05__X_draws_from_X_into_X_or_plays_from_X_into_X(args):
+    return a__p04__X_draws_from_X_into_X_or_plays_from_X_into_X_where_X(args+["true"])
 
-def a__p05__transfer_X_from_X_to_X(args): # transfers the top x1 number of items in list x2 into the list x3
+# same as a__p04__X_draws_from_X_into_X_or_plays_from_X_into_X_where_X
+# but without the draw option
+def a__p06__X_plays_from_X_into_X_where_X(args):
+    pass
+
+# same as a__p06__X_plays_from_X_into_X_where_X
+# but without condition
+def a__p07__X_plays_from_X_into_X(args):
+    pass
+
+def a__p10__transfer_X_from_X_to_X(args): # transfers the top x1 number of items in list x2 into the list x3
     x1, x2, x3 = args
     x1 = getExpr(x1)
     x2 = getExpr(x2)
@@ -138,23 +165,23 @@ def a__p05__transfer_X_from_X_to_X(args): # transfers the top x1 number of items
             x3.get().append(x2.get().pop()) # lists are mutable so x3.get() is okay. in most cases, x3.set would be necessary to update the actual payload value
     return fun
 
-def a__p05__increment_X(args): 
+def a__p10__increment_X(args): 
     def fun():
         x = getExpr(args[0])
         x.set(x.get()+1)
     return fun
 
-def a__p05__rotate_X(args): pass # X will be a number from 0 to numPlayers-1... increment it but set back to zero if equal to numPlayers (not a global value... must count players field from compiled script)
+def a__p10__rotate_X(args): pass # X will be a number from 0 to numPlayers-1... increment it but set back to zero if equal to numPlayers (not a global value... must count players field from compiled script)
 
-def a__p05__X_is_now_X(args):
+def a__p10__X_is_now_X(args):
     x1,x2 = args
     x1=getExpr(x1)
     x2=getExpr(x2)
     return lambda: x1.set(x2.get())
 
-def a__p05__reset_X(args): pass # sets x1 to it's initial value set in script
+def a__p10__reset_X(args): pass # sets x1 to it's initial value set in script
 
-def a__p05__announce_X(args):
+def a__p10__announce_X(args):
     x = args[0]
     x = x[1:-1] if x[0] is '"' and x[-1] is '"' else getExpr(x).get()
     return lambda: print(x)
@@ -171,6 +198,5 @@ def s__p05__ll__X_of_X(args):
     if x1 in x2.get():
         return lambda:expr(obj=x2.get(), key=x1)
     raise Exception("'%s' does not exist in any object"%str(x1))
-
 
  # returns a tuple, first entry is the object (such as one of the players), the second containing the key of the object (like "hand")
