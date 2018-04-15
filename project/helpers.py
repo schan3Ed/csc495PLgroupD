@@ -116,8 +116,8 @@ def g__p05__X_is_true(args):
     return lambda:bool(x1.get())
 
 def g__p05__X_is_empty(args):
-    x = args[0][0]
-    return len(x) == 0
+    x = getExpr(args[0])
+    return lambda: len(x) == 0
 
 
 def a__p01__for_every_player_X(args): # builds and calls an action to perform once for every player by calling buildAction and providing one version of the text each time, but with the word 'player' replaced with player names like 'player1' 'player2' etc
@@ -129,6 +129,8 @@ def a__p01__for_every_player_X(args): # builds and calls an action to perform on
 
 
 def a__p05__transfer_X_from_X_to_X(args): pass # transfers the top x1 number of items in list x2 into the list x3
+    for i in range(3):
+        
 
 def a__p05__increment_X(args): pass
 
