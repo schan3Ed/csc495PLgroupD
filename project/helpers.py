@@ -104,11 +104,14 @@ def g__p01__for_any_player_X(args): # similar to for_every_player guard, but ret
     return lambda: True in [guard() for guard in playerGuards]
 
 def g__p03__X_or_X(args):
-    pass
+    x1 = getExpr(args[0])
+    x2 = getExpr(args[1])
+    return lambda: x1.get() or x2.get()
 
 def g__p04__X_and_X(args):
-    pass
-
+    x1 = getExpr(args[0])
+    x2 = getExpr(args[1])
+    return lambda: x1.get() and x2.get()
 
 def g__p05__X_is_true(args):
     x1 = args[0]
