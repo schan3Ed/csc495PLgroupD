@@ -138,7 +138,11 @@ def a__p05__transfer_X_from_X_to_X(args): # transfers the top x1 number of items
             x3.append(x2.pop())
     return fun
 
-def a__p05__increment_X(args): pass
+def a__p05__increment_X(args): 
+    x = getExpr(args[0])
+    def fun():
+        x += 1
+    return lambda: x
 
 def a__p05__rotate_X(args): pass # X will be a number from 0 to numPlayers-1... increment it but set back to zero if equal to numPlayers (not a global value... must count players field from compiled script)
 
@@ -150,10 +154,15 @@ def a__p05__X_is_now_X(args):
 
 def a__p05__reset_X(args): pass # sets x1 to it's initial value set in script
 
-def a__p05__announce_X(args): pass # print x1
+def a__p05__announce_X(args):
+    x = getExpr(args[0])
+    return lambda: print(x)
+    # print x1
 
 
-def s__p05__size_of_X(args): pass # returns the size of x1
+def s__p05__size_of_X(args): 
+    return lambda: len(getExpr(args[0]))
+     # returns the size of x1
 
 def s__p05__ll__X_of_X(args):
     x1,x2 = args
