@@ -142,7 +142,7 @@ def a__p05__increment_X(args):
     x = getExpr(args[0])
     def fun():
         x += 1
-    return lambda: x
+    return fun
 
 def a__p05__rotate_X(args): pass # X will be a number from 0 to numPlayers-1... increment it but set back to zero if equal to numPlayers (not a global value... must count players field from compiled script)
 
