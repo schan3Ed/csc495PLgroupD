@@ -130,7 +130,7 @@ def a__p01__for_every_player_X(args): # builds and calls an action to perform on
 
 def a__p05__transfer_X_from_X_to_X(args): # transfers the top x1 number of items in list x2 into the list x3
     x1, x2, x3 = args
-    x1 = getExp(x1)
+    x1 = getExpr(x1)
     x2 = getExpr(x2)
     x3 = getExpr(x3)
     def fun():
