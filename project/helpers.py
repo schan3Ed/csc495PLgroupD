@@ -134,7 +134,6 @@ def a__p05__transfer_X_from_X_to_X(args): # transfers the top x1 number of items
     x2 = getExpr(x2)
     x3 = getExpr(x3)
     def fun():
-        asdf=1
         for i in range(x1.get()):
             x3.get().append(x2.get().pop())
     return fun
@@ -163,9 +162,7 @@ def a__p05__announce_X(args):
 
 
 def s__p04__size_of_X(args):
-    def fun():
-        return expr(key=len(getExpr(args[0]).get()))
-    return fun
+    return lambda:expr(key=len(getExpr(args[0]).get()))
      # returns the size of x1
 
 def s__p05__ll__X_of_X(args):
