@@ -115,7 +115,9 @@ def g__p05__X_is_true(args):
     x1 = getExpr(x1)
     return lambda:bool(x1.get())
 
-def g__p05__X_is_empty(args): pass
+def g__p05__X_is_empty(args):
+    x = args[0][0]
+    return len(x) == 0
 
 
 def a__p01__for_every_player_X(args): # builds and calls an action to perform once for every player by calling buildAction and providing one version of the text each time, but with the word 'player' replaced with player names like 'player1' 'player2' etc
