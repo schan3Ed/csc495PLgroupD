@@ -180,10 +180,13 @@ class Machine(o):
     class PayloadItem(o):
         def get(i):
             if 'obj' in i: return i.obj[i.key]
+            elif callable(i.key): return i.key().get()
             else:          return i.key
         def set(i,val):
             if 'obj' in i and 'key' in i:
                 i.obj[i.key]=val
+            elif callable(i.key):
+                i.key().set(val)
 
 class SubMachine(Machine):
     def __init__(i, name, parentMachine):

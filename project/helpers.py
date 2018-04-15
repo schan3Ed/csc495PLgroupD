@@ -67,7 +67,7 @@ def getExpr(text):
     if text in the.load.keys():
         val = expr(obj=the.load, key=text)
     elif val is not None:
-        return val()
+        return expr(key=val)
     else:
         try:
             val = ast.literal_eval(text)
@@ -134,14 +134,15 @@ def a__p05__transfer_X_from_X_to_X(args): # transfers the top x1 number of items
     x2 = getExpr(x2)
     x3 = getExpr(x3)
     def fun():
-        for i in range(x1):
-            x3.append(x2.pop())
+        asdf=1
+        for i in range(x1.get()):
+            x3.get().append(x2.get().pop())
     return fun
 
 def a__p05__increment_X(args): 
     def fun():
         x = getExpr(args[0])
-        x += 1
+        x.set(x.get()+1)
     return fun
 
 def a__p05__rotate_X(args): pass # X will be a number from 0 to numPlayers-1... increment it but set back to zero if equal to numPlayers (not a global value... must count players field from compiled script)
@@ -155,13 +156,16 @@ def a__p05__X_is_now_X(args):
 def a__p05__reset_X(args): pass # sets x1 to it's initial value set in script
 
 def a__p05__announce_X(args):
-    x = getExpr(args[0])
+    x = args[0]
+    x = x[1:-1] if x[0] is '"' and x[-1] is '"' else getExpr(x).get()
     return lambda: print(x)
     # print x1
 
 
-def s__p05__size_of_X(args): 
-    return lambda: len(getExpr(args[0]))
+def s__p04__size_of_X(args):
+    def fun():
+        return expr(key=len(getExpr(args[0]).get()))
+    return fun
      # returns the size of x1
 
 def s__p05__ll__X_of_X(args):

@@ -21,12 +21,20 @@ GAME ATTRIBUTES:
     some random integer: 1
 RULES:
     -   when starting
-        then log
         then some random integer is now 2
-        then log
         then for every player score of player is now 1
         so new game is started
     -   when new game is started
         if for every player score of player is 1
+        then for every player score of player is now 2
+        so new game is started
+    -   when new game is started
+        then announce "new game is started"
+        then log
+        then increment some random integer
+        then log
+        then transfer 10 from draw deck to face deck
+        then for every player transfer 4 from draw deck to hand of player
+        then some random integer is now size of hand of player1
         then log
         so game is finished
