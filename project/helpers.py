@@ -151,7 +151,7 @@ def a__p05__X_draws_from_X_into_X_or_plays_from_X_into_X(args):
 # same as a__p04__X_draws_from_X_into_X_or_plays_from_X_into_X_where_X
 # but without the draw option
 def a__p06__X_plays_from_X_into_X_where_X(args):
-    pass
+    return a__p07__X_plays_from_X_into_X(args + ["true"])
 
 # same as a__p06__X_plays_from_X_into_X_where_X
 # but without condition
@@ -174,7 +174,10 @@ def a__p10__increment_X(args):
         x.set(x.get()+1)
     return fun
 
-def a__p10__rotate_X(args): pass # X will be a number from 0 to numPlayers-1... increment it but set back to zero if equal to numPlayers (not a global value... must count players field from compiled script)
+def a__p10__rotate_X(args): 
+    x = getExpr(args[0]) 
+    return lambda: x.set((x.get() += 1) % load["numPlayers"])
+    # X will be a number from 0 to numPlayers-1... increment it but set back to zero if equal to numPlayers (not a global value... must count players field from compiled script)
 
 def a__p10__X_is_now_X(args):
     x1,x2 = args
