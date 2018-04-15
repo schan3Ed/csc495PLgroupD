@@ -139,8 +139,8 @@ def a__p05__transfer_X_from_X_to_X(args): # transfers the top x1 number of items
     return fun
 
 def a__p05__increment_X(args): 
-    x = getExpr(args[0])
     def fun():
+        x = getExpr(args[0])
         x += 1
     return fun
 
