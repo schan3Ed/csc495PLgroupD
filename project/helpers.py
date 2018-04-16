@@ -225,6 +225,12 @@ def g__p04__X_is_X(args):
     x2 = getExpr(x2)
     return lambda:x1.get()==x2.get()
 
+def g__p05__X_is_less_than_X(args):
+    x1,x2 = args
+    x1 = getExpr(x1)
+    x2 = getExpr(x2)
+    return lambda: x1.get() < x2.get()
+
 #
 #                ACTION HELPER FUNCTIONS
 # #################################################
