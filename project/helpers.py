@@ -214,23 +214,16 @@ def g__p05__X_is_true(args):
 def g__p05__X_is_empty(args):
     x1 = args[0]
     x1 = getExpr(x1)
-    print(x1.get())
     return lambda: len(x1.get()) == 0
 
 def g__p04__X_isnt_X(args):
-    return lambda: not g__p04__X_is_X(args)()
+    return lambda: not g__p04__X_is_X(args)
 
 def g__p04__X_is_X(args):
     x1,x2 = args
     x1 = getExpr(x1)
     x2 = getExpr(x2)
     return lambda:x1.get()==x2.get()
-
-def g__p05__X_is_less_than_X(args):
-    x1,x2 = args
-    x1 = getExpr(x1)
-    x2 = getExpr(x2)
-    return lambda: x1.get() < x2.get()
 
 #
 #                ACTION HELPER FUNCTIONS
@@ -255,58 +248,56 @@ def a__p09__for_every_player_X(args): # builds and calls an action to perform on
 # x5 is where the chosen card is placed. ie 'face deck'
 # x6 is the condition for a valid card. if false after player choice, reprompt user for choice
 def a__p06__X_draws_from_X_into_X_or_plays_from_X_into_X_where_X(args):
-    x1,x2,x3,x4,x5,x6 = args
-    isTrue = lambda x: g__p05__X_is_true([x])()
-    play = lambda x: a__p05__X_draws_from_X_into_X_or_plays_from_X_into_X(x)()
-    def fun(args=args, isTrue=isTrue, play=play):
+    def fun(args=args):
         x1,x2,x3,x4,x5,x6 = args
-        backupEnvironment = copy.deepcopy(the.load)
-        play(args[:-1])
+        isTrue = lambda x: g__p05__X_is_true([x])()
+        play = lambda x: choose(getExpr(x4).get()+["draw from %s"%x1], autoplay=the.autoplay)
+        # backupEnvironment = copy.deepcopy(the.load)
+        play()
         while not isTrue(x6) and 'draw' not in the.load.choice:
             print(colors.red("The requirement '%s' was not met. Try again."%x6))
-            the.load=backupEnvironment
-            backupEnvironment = copy.deepcopy(the.load)
-            play(args[:-1])
+            play()
+        if 'draw' in choice:
+            getExpr(x5).get().append(getExpr(x2).get().pop())
+        else:
+            getExpr(x4).get().remove(choice)
+            getExpr(x5).get().append(choice)
     return fun
 
 def a__p05__X_draws_from_X_into_X_or_plays_from_X_into_X(args):
     def fun(args=args):
         x1, x2, x3, x4, x5 = args
-        e2 = getExpr(x2)
-        e3 = getExpr(x3)
-        e4 = getExpr(x4)
-        e5 = getExpr(x5)
-        temp = (e3.get() if x3 not in the.script.players else x3, x4, x5)
-        choice = choose(e4.get()+["draw from %s"%x1], autoplay=the.autoplay)
+        choice = choose(getExpr(x4).get()+["draw from %s"%x1], autoplay=the.autoplay)
         if 'draw' in choice:
-            e5.get().append(e2.get().pop())
+            getExpr(x5).get().append(e2.get().pop())
         else:
-            e4.get().remove(choice)
-            e5.get().append(choice)
+            getExpr(x4).get().remove(choice)
+            getExpr(x5).get().append(choice)
     return fun
 
 def a__p04__X_plays_from_X_into_X_where_X(args):
-    x1,x2,x3,x4 = args
-    isTrue = lambda x: g__p05__X_is_true([x])()
-    play = lambda x: a__p03__X_plays_from_X_into_X(x)()
-    def fun(x1=x1, x2=x2, x3=x3, x4=x4, isTrue=isTrue, play=play):
+    def fun(args=args):
+        x1,x2,x3,x4 = args
+        isTrue = lambda x: g__p05__X_is_true([x])()
+        play = lambda x: choose(getExpr(x2).get()+["draw from %s"%x1], autoplay=the.autoplay)
         backupEnvironment = copy.deepcopy(the.load)
-        play([x1,x2,x3])
+        play()
         while not isTrue(x4):
             print(colors.red("The requirement '%s' was not met. Try again."%x4))
             the.load=backupEnvironment
             backupEnvironment = copy.deepcopy(the.load)
-            play([x1,x2,x3])
+            play()
+        getExpr(x2).get().remove(the.choice)
+        getExpr(x3).get().append(the.choice)
     return fun
     # return lambda: play([x1,x2,x3]) if isTrue(x4) else None
 
 def a__p03__X_plays_from_X_into_X(args):
-    x1,x2,x3 = args
-    e1=getExpr(x1)
-    e2=getExpr(x2)
-    e3=getExpr(x3)
-    def fun(x1=x1, x2=x2, x3=x3, e1=e1, e2=e2):
-        temp = (e1.get() if x1 not in the.script.players else x1, x2, x3)
+    def fun(args=args):
+        x1,x2,x3 = args
+        e1=getExpr(x1)
+        e2=getExpr(x2)
+        e3=getExpr(x3)
         choice = choose(e2.get(), autoplay=the.autoplay)
         e2.get().remove(choice)
         e3.get().append(choice)
@@ -332,17 +323,33 @@ def a__p00__increment_X(args):
 # the.load['current player'] == 'player 3'
 # the.script.players = ['player 1', 'player 2','player 3']
 # after the action takes place, the.load['current player']=='player 1'
+def a__p01__reverse_rotate_X(args):
+    x1 = args[0]
+    x1 = getExpr(x1)
+    p = the.script.players
+    return lambda: x1.set(p[(p.index(x1.get())-1) % len(p)]) # decrements index but cycles at boundary
+
 def a__p00__rotate_X(args):
     x1 = args[0]
     x1 = getExpr(x1)
     p = the.script.players
     return lambda: x1.set(p[(p.index(x1.get())+1) % len(p)]) # increments index but cycles at boundary
 
-def a__p01__reverse_rotate_X(args):
-    x1 = args[0]
-    x1 = getExpr(x1)
-    p = the.script.players
-    return lambda: x1.set(p[(p.index(x1.get())-1) % len(p)]) # decrements index but cycles at boundary
+def a__p01__announce_X_without_new_line(args):
+    x = args[0]
+    isQuoted = bool(x[0] is '"' and x[-1] is '"')
+    x = x[1:-1] if isQuoted else getExpr(x)
+    return lambda: print(x if isQuoted else x.get(), end='')
+
+def a__p01__with_the_color_X_announce_X(args):
+    x1,x2 = args
+    if x1 in colors.COLORS:
+        color = lambda x:partial(colors.color, fg=x1)(str(x))
+    elif x1 in colors.STYLES:
+        color = lambda x:partial(colors.color, style=x1)(str(x))
+    isQuoted = bool(x2[0] is '"' and x2[-1] is '"')
+    x2 = x2[1:-1] if isQuoted else getExpr(x2)
+    return lambda: print(color(x2 if isQuoted else x2.get()))
 
 def a__p00__X_is_now_X(args):
     x1,x2 = args
@@ -352,32 +359,6 @@ def a__p00__X_is_now_X(args):
 
 def a__p00__reset_X(args): pass # sets x1 to it's initial value set in script
 
-def a__p01__announce_X_without_new_line(args):
-    x = args[0]
-    isQuoted = bool(x[0] is '"' and x[-1] is '"')
-    x = x[1:-1] if isQuoted else getExpr(x)
-    return lambda: print(x if isQuoted else x.get(), end='')
-
-def a__p01__with_the_color_X_announce_X(args):
-    def fun(args=args):
-        color, x = args
-        if x1 in colors.COLORS:
-            color = lambda x: partial(colors.color, fg=x1)(str(x))
-        elif x1 in colors.STYLES:
-            color = lambda x: partial(colors.color, style=x1)(str(x))
-        isQuoted = bool(x[0] is '"' and x[-1] is '"')
-        if isQuoted:
-            x = x[1:-1]
-            print(color(x))
-            return None
-        x = getExpr(x)
-        if x.get() == args[1]:
-            x = buildCommand(x.get(), guards(), forcematch=False)()
-            print(color(x))
-            return None
-        print(color(x.get()))
-        return None
-    return fun
 
 def a__p00__shuffle_X(args):
     x = args[0]
@@ -385,21 +366,10 @@ def a__p00__shuffle_X(args):
     return lambda: shuffle(x.get())
 
 def a__p00__announce_X(args):
-    def fun(args=args):
-        x = args[0]
-        isQuoted = bool(x[0] is '"' and x[-1] is '"')
-        if isQuoted:
-            x = x[1:-1]
-            print(x)
-            return None
-        x = getExpr(x)
-        if x.get() == args[0]:
-            x = buildCommand(x.get(), guards(), forcematch=False)()
-            print(x)
-            return None
-        print(x.get())
-        return None
-    return fun
+    x = args[0]
+    isQuoted = bool(x[0] is '"' and x[-1] is '"')
+    x = x[1:-1] if isQuoted else getExpr(x)
+    return lambda: print(x if isQuoted else x.get())
 
 #
 #                SHARED HELPER FUNCTIONS
