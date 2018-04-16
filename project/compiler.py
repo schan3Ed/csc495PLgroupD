@@ -99,7 +99,7 @@ def spec(m, s, t):"""
 
 # specifies which script to compile, compiles it, and runs it
 def run():
-    with open('test_script.yaml', 'r') as file:
+    with open('spades_script.yaml', 'r') as file:
         the.script=file.read()
 
     precompile()

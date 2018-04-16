@@ -305,7 +305,7 @@ def a__p03__X_plays_from_X_into_X(args):
         e3.get().append(choice)
     return fun
 
-def a__p00__transfer_X_from_X_to_X(args):
+def a__p00__transfer_X_cards_from_X_to_X(args):
     x1, x2, x3 = args
     x1 = getExpr(x1)
     x2 = getExpr(x2)
@@ -381,6 +381,10 @@ def s__p05__top_card_of_X(args):
 def s__p06__rank_of_X(args):
     x1=args[0]
     return lambda: expr(key=getRank(getExpr(x1).get()))
+
+def s__p06__suit_of_X(args):
+    x1=args[0]
+    return lambda: expr(key=getSuit(getExpr(x1).get()))
 
 def s__p06__size_of_X(args):
     return lambda:expr(key=len(getExpr(args[0]).get()))
