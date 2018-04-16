@@ -22,9 +22,7 @@ RULES:
     -   when starting
         so new game is started
     -   when new game is started
-        then log
         then for every player transfer 5 cards from draw deck to hand of player
-        then log
         so new turn is started
     -   when new turn is started
         if hand of current player is empty

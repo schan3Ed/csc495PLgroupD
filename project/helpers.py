@@ -121,7 +121,7 @@ def getSuit(card):
         c='clubs',
         d='diamonds'
     )
-    return card[-1]
+    return suitmap[card[-1]]
 
 def getRank(card):
     try:
@@ -305,7 +305,7 @@ def a__p03__X_plays_from_X_into_X(args):
         e3.get().append(choice)
     return fun
 
-def a__p00__transfer_X_cards_from_X_to_X(args):
+def a__p00__transfer_X_from_X_to_X(args):
     x1, x2, x3 = args
     x1 = getExpr(x1)
     x2 = getExpr(x2)
@@ -361,6 +361,11 @@ def a__p01__with_the_color_X_announce_X(args):
     x2 = x2[1:-1] if isQuoted else getExpr(x2)
     return lambda: print(color(x2 if isQuoted else x2.get()))
 
+def a__p00__shuffle_X(args):
+    x = args[0]
+    x = getExpr(x)
+    return lambda: shuffle(x.get())
+
 def a__p00__announce_X(args):
     x = args[0]
     isQuoted = bool(x[0] is '"' and x[-1] is '"')
@@ -374,6 +379,8 @@ def a__p00__announce_X(args):
 # have lower priorities than functions that
 # return descriptive values of that card (unless said value is in fact another card)
 
+
+
 def s__p05__top_card_of_X(args):
     x1=args[0]
     return lambda: expr(key=getExpr(x1).get()[-1])
@@ -381,10 +388,6 @@ def s__p05__top_card_of_X(args):
 def s__p06__rank_of_X(args):
     x1=args[0]
     return lambda: expr(key=getRank(getExpr(x1).get()))
-
-def s__p06__suit_of_X(args):
-    x1=args[0]
-    return lambda: expr(key=getSuit(getExpr(x1).get()))
 
 def s__p06__size_of_X(args):
     return lambda:expr(key=len(getExpr(args[0]).get()))
