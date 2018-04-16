@@ -50,16 +50,7 @@ RULES:
                 from hand of current player
                 into face deck
                 where suit of choice is suit of top card of face deck
+        unless hand of current player is empty
+        so new turn is started
+        when turn is finished
         so game is finished
-    #-   when new turn is started
-    #    unless hand of current player is empty
-    #    then rotate current player
-    #    so new turn is started
-    #-   when new round is started
-    #    if for any player size of hand of player is five
-    #    then announce "player with highest score wins"
-    #    so game is finished
-    # -   when new round is started
-    #     unless size of hand of any player is five
-    #     then rotate starting player
-    #     then for every player reset hand of player
