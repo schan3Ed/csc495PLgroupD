@@ -389,6 +389,10 @@ def s__p06__rank_of_X(args):
     x1=args[0]
     return lambda: expr(key=getRank(getExpr(x1).get()))
 
+def s__p06__suit_of_X(args):
+    x1=args[0]
+    return lambda: expr(key=getSuit(getExpr(x1).get()))
+
 def s__p06__size_of_X(args):
     return lambda:expr(key=len(getExpr(args[0]).get()))
 
