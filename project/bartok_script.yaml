@@ -43,7 +43,10 @@ RULES:
 
     -   when new turn is started
         unless hand of current player is empty
-
+        then announce "Current Player " without new line 
+        then announce current player
+        then announce "Face Deck " without new line
+        then announce face deck
         then current player
             draws
                 from draw deck
@@ -54,7 +57,7 @@ RULES:
                 where
                     face deck is empty
                 or
-                    rank of choice is rank of top card of draw deck   
+                    rank of choice is rank of top card of face deck
         then rotate current player
         so new turn is started
 
