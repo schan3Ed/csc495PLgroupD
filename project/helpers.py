@@ -193,7 +193,7 @@ def g__p09__for_any_player_X(args): # similar to for_every_player guard, but ret
 def g__p07__X_or_X(args):
     x1,x2 = args
     isTrue = lambda x: g__p05__X_is_true([x])()
-    return lambda: isTrue(x1)() or isTrue(x2)()
+    return lambda: isTrue(x1) or isTrue(x2)
 
 def g__p06__X_and_X(args):
     x1,x2 = args
