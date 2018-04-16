@@ -8,36 +8,42 @@ import ast
 from types import MethodType
 import the
 
-script=the.script
-# maps of helper function names and the actual function
+# This is a class. Think of instances of this class as a pointer to an immutable object which belongs to some other dictionary/object variable.
+# In this module, the other dictionary/object variable will almost always be the.load or a value that the.load contains
+# if type(e)==expr then:
+#   e.get() returns the actual immutable value (which in some cases, could be a mutable list)
+#   e.set(val) sets the immutable value to val by altering the source/obj/dictionary that originally contained the immutable value 
 expr=Machine.PayloadItem
 
+# each of these return a map where keys are function names and values are the actual functions
 def guards():  return o.convert({k : v for k,v in inspect.getmembers(helpers, inspect.isfunction) if k.startswith('g__')})
 def actions(): return o.convert({k : v for k,v in inspect.getmembers(helpers, inspect.isfunction) if k.startswith('a__')})
 def shared():  return o.convert({k : v for k,v in inspect.getmembers(helpers, inspect.isfunction) if k.startswith('s__')})
-# re.sub https://stackoverflow.com/questions/31005138/replace-regex-matches-in-a-string-with-items-from-a-list-in-order
 
-def buildAction(text):return buildCommand(text, actions())
+# these are command builders
+# they are functions that loop through helper functions, and return the corresponding lambda function that is meant to be executed at run time 
+def buildAction(text):
+    return buildCommand(text, actions())
 def buildGuard(text):
     command = buildCommand(text, guards(), forcematch=False)
     return command if command else lambda:True
-
 def buildCommand(text, commands, forcematch=None):
     forcematch = True if forcematch is None else forcematch
-    if(text is 'log'):
-        return lambda:log(the.load) or True
-    for key,func in commands.itemsbykey():
-        if matchesFunction(text,key):
-            return func(getArgs(text, key))
-    if(forcematch):
-        raise Exception("Could not build command \"%s\""%text)
+    try:
+        if(text is 'log'):
+            return lambda:log(the.load) or True
+        for key,func in commands.itemsbykey(reversed=True):
+            if matchesFunction(text,key):
+                return func(getArgs(text, key))
+    except Exception as e:
+        if(forcematch): raise e
     return None
 
+# these are functions used by the command builders
 def matchesFunction(text,fString):
     if re.compile("^"+getFRegStr(fString)+"$").match(text) is not None:
         return True
     return False
-
 def getArgs(text, fString):
     search = re.compile("[ags]__p[0-9]+__(ll__)?(.*)").search(fString)
     preOrderTraversal = bool(search.group(1))
@@ -47,7 +53,6 @@ def getArgs(text, fString):
     args = re.compile(regstr).findall(text)[0]
     args = [args] if type(args) is str else [arg for arg in args]
     return args
-
 def getFRegStr(fString):
     fString = fString.replace('ll__','')
     search = re.compile("[ags]__p[0-9]+__(.*)").search(fString)
@@ -59,6 +64,8 @@ def getFRegStr(fString):
     #     regstr = "([^(%s)]*)%s"%(regstr[4:regstr.rindex("(.*)")],regstr[4:])
     return regstr
 
+# this function is similar to a command builder, except it is responsable for using the shared helper functions
+# possibly nested within arguments for guard and action commands. This function builds an expr (see top of page)
 def getExpr(text):
     # class Expr(o):
     # 	def get(i): return i.obj[i.key]
@@ -76,60 +83,112 @@ def getExpr(text):
             val = expr(key=text)
     return val
 
+# this is how the game maker can prompt for input.
+# autoplay just returns a random choice from options.
+def choose(options, prompt = None, autoplay=None):
+    prompt = prompt or ''
+    autoplay = autoplay or False
+    if autoplay:
+        choice = random.choice(options)
+    else:
+        choice = None
+        while choice is None:
+            try:
+                if prompt != '' and prompt[-1]!=' ':
+                    prompt += ' '
+                print("%s(type a number then hit Enter)" % prompt)
+                print("\n".join(["%i: %s" % (idx,option) for idx, option in enumerate(options)]))
+                number = int(input("enter a number: "))
+                if number < 0 or number >= len(options):
+                    raise IndexError("INVALID INPUT: that number is not an option")
+                choice = options[number]
+                print(colors.negative("YOU CHOSE %s" % choice))
+            except Exception as e:
+                print(colors.red('Invalid Input. Try again.'))
+    the.load.system.choice=choice
+    return choice
+
+# #################################################
+# ############### HELPER FUNCTIONS ################
+# #################################################
+# Helper functions define the syntax of the language used for RULES in the game maker's script
+# Helper functions take strings in place of X's in their function names, and return a lambda to perform some operation or return some value at run time
 # helper function format: A__pBB__C
-# A is either g for guard commands, a for action commands, or s for shared commands
-# B is the priority of the function, which determines the order in which is it checked and matched to user input (lower values first)
-#   for example: if user input was "size of draw deck" and the following functions existed:
-#       a__p01__size_of_X
-#       a__p02__size_X
-#   the input would evaluate to lambda: a__p01__size_of_X(the.load['draw deck'])
-#   instead of                  lambda: a__p02__size_X(the.load['of draw deck'])
+# A is either g for guard commands, a for action commands, or s for shared commands (which are usually just accessors used to enhance the getExpr method)
+# B is the priority of the function
+#   function priority determines the order in which the parse tree is constructed in the event that more than one helper function matches input
+#   higher priorities become higher nodes in the parse tree
+#       for example: if user input was "size of draw deck" and the following functions existed:
+#           a__p01__X_of_X
+#           a__p02__size_of_X
+#       the input would evaluate to lambda: a__p02__size_of_X(['draw deck'])
+#       instead of                  lambda: a__p01__X_of_X(['size','draw deck'])
 # C pattern used to match user input.
+#   if C is preceeded with 'll__'
+#       it means that it's parse tree is left associative. LR is default
+#       it is especially useful for the previous example X_of_X if the user were to chain it
+#           ie '__ll' would make the input 'size of hand of player1' become:
+#               this:       a__p01__X_of_X(['size','hand of player1'])
+#               instead of: a__p01__X_of_X(['size of hand','player1'])
 #
-# NOTE: the number of X's in the function determines the number of parameters it should accept, 
-# in addition to where those parameters should be expected from user input
-# Note: order of functions with matching priorities is undefined
+# NOTE: every helper function takes a single argument, a list of strings.
+#   The number of X's (only capital) in the function determines the number strings it should accept 
+#   and also the order in which those strings appear. For examples, see previous examples in this comment.
+#   Note: parse tree behavior of functions with matching priorities is undefined.
+#   Functions with matching priorities should theoretically never conflict given proper syntax/grammer
 
 
-def g__p01__for_every_player_X(args): # similar to the action version of this function, but only returns true if the evaluated guard returns true for all players
+def g__p09__for_every_player_X(args): # similar to the action version of this function, but only returns true if the evaluated guard returns true for all players
     x1=args[0]
     playerGuards = [re.sub(r"\bplayer\b", player, x1) for player in the.script.players]
     playerGuards = [buildGuard(guard) for guard in playerGuards]
     return lambda:False not in [guard() for guard in playerGuards]
 
-def g__p01__for_any_player_X(args): # similar to for_every_player guard, but returns true if at least 1 guards evaluate to true
+def g__p09__for_any_player_X(args): # similar to for_every_player guard, but returns true if at least 1 guards evaluate to true
     x1=args[0]
     playerGuards = [re.sub(r"\bplayer\b", player, x1) for player in the.script.players]
     playerGuards = [buildGuard(guard) for guard in playerGuards]
     return lambda: True in [guard() for guard in playerGuards]
 
-def g__p03__X_or_X(args):
-    x1 = getExpr(args[0])
-    x2 = getExpr(args[1])
-    return lambda: x1.get() or x2.get()
+def g__p07__X_or_X(args):
+    x1,x2 = args
+    isTrue = lambda x: g__p05__X_is_true([x])()
+    return lambda: isTrue(x1)() or isTrue(x2)()
 
-def g__p04__X_and_X(args):
-    x1 = getExpr(args[0])
-    x2 = getExpr(args[1])
-    return lambda: x1.get() and x2.get()
+def g__p06__X_and_X(args):
+    x1,x2 = args
+    isTrue = lambda x: g__p05__X_is_true([x])()
+    return lambda: isTrue(x1) and isTrue(x2)
+
+def g__p05__X_is_false(args):
+    isTrue = lambda x: g__p05__X_is_true([x])()
+    return lambda:not isTrue(args)
 
 def g__p05__X_is_true(args):
     x1 = args[0]
+    x1 = buildCommand(x1, guards(), forcematch=False)
+    x1 = x1 or args[0]
     x1 = getExpr(x1)
-    return lambda:bool(x1.get())
-
+    return lambda: x1() if callable(x1) else bool(x1.get()) and x1.get()!=[]
+    
 def g__p05__X_is_empty(args):
-    x = getExpr(args[0])
-    return lambda: len(x) == 0
+    x1 = args[0]
+    x1 = getExpr(x1)
+    return lambda: len(x1) == 0
 
-def g__p06__X_is_X(args):
+def g__p04__X_is_X(args):
     x1,x2 = args
     x1 = getExpr(x1)
     x2 = getExpr(x2)
     return lambda:x1.get()==x2.get()
 
+def a__p10__for_every_player_X_where_X(args):
+    x1,x2=args
+    isTrue = lambda x: g__p05__X_is_true([x])()
+    forEveryPlayer = lambda x: a__p09__for_every_player_X(x)()
+    return lambda: forEveryPlayer(x1) if isTrue(x2) else None
 
-def a__p01__for_every_player_X(args): # builds and calls an action to perform once for every player by calling buildAction and providing one version of the text each time, but with the word 'player' replaced with player names like 'player1' 'player2' etc
+def a__p09__for_every_player_X(args): # builds and calls an action to perform once for every player by calling buildAction and providing one version of the text each time, but with the word 'player' replaced with player names like 'player1' 'player2' etc
     x1=args[0]
     playerActions = [re.sub(r"\bplayer\b", player, x1) for player in the.script.players]
     playerActions = [buildAction(action) for action in playerActions]
@@ -141,65 +200,101 @@ def a__p01__for_every_player_X(args): # builds and calls an action to perform on
 # x4 are the player's card options. likely the players hand
 # x5 is where the chosen card is placed. ie 'face deck'
 # x6 is the condition for a valid card. if false after player choice, reprompt user for choice
-def a__p04__X_draws_from_X_into_X_or_plays_from_X_into_X_where_X(args):
-    pass
+def a__p06__X_draws_from_X_into_X_or_plays_from_X_into_X_where_X(args):
+    x1,x2,x3,x4,x5,x6 = args
+    isTrue = lambda x: g__p05__X_is_true([x])()
+    drawOrPlay = lambda x: a__p05__X_draws_from_X_into_X_or_plays_from_X_into_X(x)()
+    return lambda: drawOrPlay([x1,x2,x3,x4,x5]) if isTrue(x6) else None
 
-# same as returned function below, but without condition
-def a__p05__X_draws_from_X_into_X_or_plays_from_X_into_X(args):
-    return a__p04__X_draws_from_X_into_X_or_plays_from_X_into_X_where_X(args+["true"])
+def a__p05__X_draws_from_X_into_X_or_plays_from_X_into_X(args): pass
+    # x1,x2,x3,x4,x5 = args
+    # return a__p06__X_draws_from_X_into_X_or_plays_from_X_into_X_where_X(args+["true"])
 
-# same as a__p04__X_draws_from_X_into_X_or_plays_from_X_into_X_where_X
-# but without the draw option
-def a__p06__X_plays_from_X_into_X_where_X(args):
-    pass
+def a__p04__X_plays_from_X_into_X_where_X(args):
+    x1,x2,x3,x4 = args
+    isTrue = lambda x: g__p05__X_is_true([x])()
+    play = lambda x: a__p05__X_draws_from_X_into_X_or_plays_from_X_into_X(x)()
+    return lambda: play([x1,x2,x3]) if isTrue(x4) else None
 
-# same as a__p06__X_plays_from_X_into_X_where_X
-# but without condition
-def a__p07__X_plays_from_X_into_X(args):
-    pass
+def a__p03__X_plays_from_X_into_X(args):
+    x1,x2,x3 = args
+    e1=getExpr(x1)
+    e2=getExpr(x2)
+    e3=getExpr(x3)
+    def fun(x1=x1, x2=x2, x3=x3, e1=e1, e2=e2):
+        temp = (e1.get() if x1 not in the.script.players else x1, x2, x3)
+        choice = choose(e2.get(), autoplay=False)
+        e2.get().remove(choice)
+        e3.get().append(choice)
+    return fun
 
-def a__p10__transfer_X_from_X_to_X(args): # transfers the top x1 number of items in list x2 into the list x3
+def a__p00__transfer_X_from_X_to_X(args):
     x1, x2, x3 = args
     x1 = getExpr(x1)
     x2 = getExpr(x2)
     x3 = getExpr(x3)
-    def fun():
-        for i in range(x1.get()):
-            x3.get().append(x2.get().pop()) # lists are mutable so x3.get() is okay. in most cases, x3.set would be necessary to update the actual payload value
-    return fun
+    # lists are mutable so x3.get() is okay. but in most cases, x3.set would be necessary to update the actual payload value
+    return lambda: [x3.get().append(x2.get().pop()) for i in range(x1.get())]
 
-def a__p10__increment_X(args): 
+def a__p00__increment_X(args): 
     def fun():
         x = getExpr(args[0])
         x.set(x.get()+1)
     return fun
 
-def a__p10__rotate_X(args): pass # X will be a number from 0 to numPlayers-1... increment it but set back to zero if equal to numPlayers (not a global value... must count players field from compiled script)
+# x1 is a string for a load key who's value is a string for a player
+# EXAMPLE
+# x1 == 'current player'
+# the.load['current player'] == 'player 3'
+# the.script.players = ['player 1', 'player 2','player 3']
+# after the action takes place, the.load['current player']=='player 1'
+def a__p00__rotate_X(args):
+    x1 = args[0]
+    x1 = getExpr(x1)
+    p = the.script.players
+    return lambda: x1.set(p[(p.index(x1.get())+1) % len(p)]) # increments index but cycles at boundary
 
-def a__p10__X_is_now_X(args):
+def a__p01__reverse_rotate_X(args):
+    x1 = args[0]
+    x1 = getExpr(x1)
+    p = the.script.players
+    return lambda: x1.set(p[(p.index(x1.get())-1) % len(p)]) # decrements index but cycles at boundary
+
+def a__p00__X_is_now_X(args):
     x1,x2 = args
     x1=getExpr(x1)
     x2=getExpr(x2)
     return lambda: x1.set(x2.get())
 
-def a__p10__reset_X(args): pass # sets x1 to it's initial value set in script
+def a__p00__reset_X(args): pass # sets x1 to it's initial value set in script
 
-def a__p10__announce_X(args):
+def a__p01__announce_X_without_new_line(args):
     x = args[0]
-    x = x[1:-1] if x[0] is '"' and x[-1] is '"' else getExpr(x).get()
-    return lambda: print(x)
-    # print x1
+    isQuoted = bool(x[0] is '"' and x[-1] is '"')
+    x = x[1:-1] if isQuoted else getExpr(x)
+    return lambda: print(x if isQuoted else x.get(), end='')
+
+def a__p00__announce_X(args):
+    x = args[0]
+    isQuoted = bool(x[0] is '"' and x[-1] is '"')
+    x = x[1:-1] if isQuoted else getExpr(x)
+    return lambda: print(x if isQuoted else x.get())
 
 
-def s__p04__size_of_X(args):
+def s__p06__size_of_X(args):
     return lambda:expr(key=len(getExpr(args[0]).get()))
-     # returns the size of x1
 
 def s__p05__ll__X_of_X(args):
     x1,x2 = args
     x2 = getExpr(x2)
-    if x1 in x2.get():
-        return lambda:expr(obj=x2.get(), key=x1)
+    def fun(x1=x1, x2=x2):
+        if x1 in x2.get():
+            return expr(obj=x2.get(), key=x1)
+        else:
+            while 'obj' in getExpr(x2.get()):
+                x2 = getExpr(x2.get())
+                if x1 in x2.get():
+                    return expr(obj=x2.get(), key=x1)
+        raise Exception("'%s' does not exist in any object"%str(x1))
+    return fun
     raise Exception("'%s' does not exist in any object"%str(x1))
-
- # returns a tuple, first entry is the object (such as one of the players), the second containing the key of the object (like "hand")

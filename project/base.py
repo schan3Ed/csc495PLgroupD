@@ -101,11 +101,13 @@ class o(JsonSerializable):
     def items(i):
         return i.__dict__.items()
 
-    def itemsbykey(i):
-        return sorted(i.items())
+    def itemsbykey(i, reversed=None):
+        reversed = reversed or False
+        return sorted(i.items(), reverse=reversed)
 
-    def itemsbyvalue(i):
-        sorted(i.items(),key=lambda item:item[1])
+    def itemsbyvalue(i, reversed=None):
+        reversed = reversed or False
+        sorted(i.items(),key=lambda item:item[1], reverse=reversed)
 
     def keys(i):
         return i.__dict__.keys()
