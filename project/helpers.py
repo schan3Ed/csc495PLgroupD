@@ -214,7 +214,7 @@ def g__p05__X_is_true(args):
 def g__p05__X_is_empty(args):
     x1 = args[0]
     x1 = getExpr(x1)
-    return lambda: len(x1) == 0
+    return lambda: len(x1.get()) == 0
 
 def g__p04__X_isnt_X(args):
     return lambda: not g__p04__X_is_X(args)
