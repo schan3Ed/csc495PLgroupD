@@ -53,5 +53,20 @@ RULES:
         then announce "face deck is " without new line
         then announce face deck
         then announce "your current hand is " without new line
-        then announce hand of current player
+        then with the color black announce hand of current player
+        then with the color red announce "asdfasdfasdfasdfasdfasdf"
+        then with the color negative announce "asdfasdfasdfasdfasdfasdf"
+        then rotate current player
+        then current player
+            plays
+                from hand of current player 
+                into face deck 
+        then current player
+            draws
+                from draw deck
+                into hand of current player
+            or plays
+                from hand of current player 
+                into face deck 
+                where rank of choice is rank of top card of draw deck
         so game is finished

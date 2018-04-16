@@ -2,11 +2,14 @@
 # yaml install instructions: Run pycharm as administrator, open terminal window/view, and execute "pip3 install pyyaml"
 import sys, re, traceback, time, random, json, yaml, copy, inspect
 from machine import *
+from base import o
 import helpers
 import operator
 import ast
 from types import MethodType
 import the
+import colors
+from functools import partial
 
 # This is a class. Think of instances of this class as a pointer to an immutable object which belongs to some other dictionary/object variable.
 # In this module, the other dictionary/object variable will almost always be the.load or a value that the.load contains
@@ -90,6 +93,7 @@ def choose(options, prompt = None, autoplay=None):
     autoplay = autoplay or False
     if autoplay:
         choice = random.choice(options)
+        print(colors.negative("You chose %s from %s"%(choice, options)))
     else:
         choice = None
         while choice is None:
@@ -105,8 +109,35 @@ def choose(options, prompt = None, autoplay=None):
                 print(colors.negative("YOU CHOSE %s" % choice))
             except Exception as e:
                 print(colors.red('Invalid Input. Try again.'))
-    the.load.system.choice=choice
+    the.load.choice=choice
     return choice
+
+def getColor(card): pass #TODO
+
+def getSuit(card):
+    suitmap=o(
+        h='hearts',
+        s='spades',
+        c='clubs',
+        d='diamonds'
+    )
+    return card[-1]
+
+def getRank(card):
+    try:
+        val = card[:-1]
+        val = ast.literal_eval(val)
+        if val > 10:
+            rankMap=o({
+                    '11':'jack',
+                    '12':'queen',
+                    '13':'king'
+                }
+            )
+            val = rankMap[str(val)]
+        return val
+    except Exception as e:
+        return None
 
 # #################################################
 # ############### HELPER FUNCTIONS ################
@@ -134,10 +165,19 @@ def choose(options, prompt = None, autoplay=None):
 # NOTE: every helper function takes a single argument, a list of strings.
 #   The number of X's (only capital) in the function determines the number strings it should accept 
 #   and also the order in which those strings appear. For examples, see previous examples in this comment.
-#   Note: parse tree behavior of functions with matching priorities is undefined.
+# NOTE: parse tree behavior of functions with matching priorities is undefined.
 #   Functions with matching priorities should theoretically never conflict given proper syntax/grammer
+# NOTE: functions of the same type (the value of A in the function name), are never checked simultaneously, therefore priorties will never conflict
 
+# WHERE HELPER FUNCTIONS ARE USED IN THE LANGUAGE
+# Only used in the RULES section of the game maker's script. 
+# 'if'/'unless' followed by text will parse that text as a guard function/ 
+# 'then' followed by text will parse that text as an action function.
+# shared functions (A=='s') are never the root operation of a parse tree, rather, they are used by other functions, often via the getExpr function 
 
+#
+#                GUARD HELPER FUNCTIONS
+# #################################################
 def g__p09__for_every_player_X(args): # similar to the action version of this function, but only returns true if the evaluated guard returns true for all players
     x1=args[0]
     playerGuards = [re.sub(r"\bplayer\b", player, x1) for player in the.script.players]
@@ -176,11 +216,18 @@ def g__p05__X_is_empty(args):
     x1 = getExpr(x1)
     return lambda: len(x1) == 0
 
+def g__p04__X_isnt_X(args):
+    return lambda: not g__p04__X_is_X(args)
+
 def g__p04__X_is_X(args):
     x1,x2 = args
     x1 = getExpr(x1)
     x2 = getExpr(x2)
     return lambda:x1.get()==x2.get()
+
+#
+#                ACTION HELPER FUNCTIONS
+# #################################################
 
 def a__p10__for_every_player_X_where_X(args):
     x1,x2=args
@@ -203,18 +250,48 @@ def a__p09__for_every_player_X(args): # builds and calls an action to perform on
 def a__p06__X_draws_from_X_into_X_or_plays_from_X_into_X_where_X(args):
     x1,x2,x3,x4,x5,x6 = args
     isTrue = lambda x: g__p05__X_is_true([x])()
-    drawOrPlay = lambda x: a__p05__X_draws_from_X_into_X_or_plays_from_X_into_X(x)()
-    return lambda: drawOrPlay([x1,x2,x3,x4,x5]) if isTrue(x6) else None
+    play = lambda x: a__p05__X_draws_from_X_into_X_or_plays_from_X_into_X(x)()
+    def fun(args=args, isTrue=isTrue, play=play):
+        x1,x2,x3,x4,x5,x6 = args
+        backupEnvironment = copy.deepcopy(the.load)
+        play(args[:-1])
+        while not isTrue(x6) and 'draw' not in the.load.choice:
+            print(colors.red("The requirement '%s' was not met. Try again."%x6))
+            the.load=backupEnvironment
+            backupEnvironment = copy.deepcopy(the.load)
+            play(args[:-1])
+    return fun
 
-def a__p05__X_draws_from_X_into_X_or_plays_from_X_into_X(args): pass
-    # x1,x2,x3,x4,x5 = args
-    # return a__p06__X_draws_from_X_into_X_or_plays_from_X_into_X_where_X(args+["true"])
+def a__p05__X_draws_from_X_into_X_or_plays_from_X_into_X(args):
+    def fun(args=args):
+        x1, x2, x3, x4, x5 = args
+        e2 = getExpr(x2)
+        e3 = getExpr(x3)
+        e4 = getExpr(x4)
+        e5 = getExpr(x5)
+        temp = (e3.get() if x3 not in the.script.players else x3, x4, x5)
+        choice = choose(e4.get()+["draw from %s"%x1], autoplay=the.autoplay)
+        if 'draw' in choice:
+            e5.get().append(e2.get().pop())
+        else:
+            e4.get().remove(choice)
+            e5.get().append(choice)
+    return fun
 
 def a__p04__X_plays_from_X_into_X_where_X(args):
     x1,x2,x3,x4 = args
     isTrue = lambda x: g__p05__X_is_true([x])()
-    play = lambda x: a__p05__X_draws_from_X_into_X_or_plays_from_X_into_X(x)()
-    return lambda: play([x1,x2,x3]) if isTrue(x4) else None
+    play = lambda x: a__p03__X_plays_from_X_into_X(x)()
+    def fun(x1=x1, x2=x2, x3=x3, x4=x4, isTrue=isTrue, play=play):
+        backupEnvironment = copy.deepcopy(the.load)
+        play([x1,x2,x3])
+        while not isTrue(x4):
+            print(colors.red("The requirement '%s' was not met. Try again."%x4))
+            the.load=backupEnvironment
+            backupEnvironment = copy.deepcopy(the.load)
+            play([x1,x2,x3])
+    return fun
+    # return lambda: play([x1,x2,x3]) if isTrue(x4) else None
 
 def a__p03__X_plays_from_X_into_X(args):
     x1,x2,x3 = args
@@ -223,7 +300,7 @@ def a__p03__X_plays_from_X_into_X(args):
     e3=getExpr(x3)
     def fun(x1=x1, x2=x2, x3=x3, e1=e1, e2=e2):
         temp = (e1.get() if x1 not in the.script.players else x1, x2, x3)
-        choice = choose(e2.get(), autoplay=False)
+        choice = choose(e2.get(), autoplay=the.autoplay)
         e2.get().remove(choice)
         e3.get().append(choice)
     return fun
@@ -274,17 +351,41 @@ def a__p01__announce_X_without_new_line(args):
     x = x[1:-1] if isQuoted else getExpr(x)
     return lambda: print(x if isQuoted else x.get(), end='')
 
+def a__p01__with_the_color_X_announce_X(args):
+    x1,x2 = args
+    if x1 in colors.COLORS:
+        color = lambda x:partial(colors.color, fg=x1)(str(x))
+    elif x1 in colors.STYLES:
+        color = lambda x:partial(colors.color, style=x1)(str(x))
+    isQuoted = bool(x2[0] is '"' and x2[-1] is '"')
+    x2 = x2[1:-1] if isQuoted else getExpr(x2)
+    return lambda: print(color(x2 if isQuoted else x2.get()))
+
 def a__p00__announce_X(args):
     x = args[0]
     isQuoted = bool(x[0] is '"' and x[-1] is '"')
     x = x[1:-1] if isQuoted else getExpr(x)
     return lambda: print(x if isQuoted else x.get())
 
+#
+#                SHARED HELPER FUNCTIONS
+# #################################################
+# make sure getters that return a card (aka any instance from any list)
+# have lower priorities than functions that
+# return descriptive values of that card (unless said value is in fact another card)
+
+def s__p05__top_card_of_X(args):
+    x1=args[0]
+    return lambda: expr(key=getExpr(x1).get()[-1])
+
+def s__p06__rank_of_X(args):
+    x1=args[0]
+    return lambda: expr(key=getRank(getExpr(x1).get()))
 
 def s__p06__size_of_X(args):
     return lambda:expr(key=len(getExpr(args[0]).get()))
 
-def s__p05__ll__X_of_X(args):
+def s__p01__ll__X_of_X(args):
     x1,x2 = args
     x2 = getExpr(x2)
     def fun(x1=x1, x2=x2):
@@ -297,4 +398,3 @@ def s__p05__ll__X_of_X(args):
                     return expr(obj=x2.get(), key=x1)
         raise Exception("'%s' does not exist in any object"%str(x1))
     return fun
-    raise Exception("'%s' does not exist in any object"%str(x1))

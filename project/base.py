@@ -30,6 +30,13 @@ def ok(f=None):
             TRY, FAIL,
             int(round((TRY - FAIL) * 100 / (TRY + 0.001)))))
 
+def throwsError(func):
+    try:
+        func()
+        return False
+    except Exception as e:
+        return True
+
 def shuffle(lst):
     random.shuffle(lst)
     return lst
@@ -91,6 +98,20 @@ class o(JsonSerializable):
 
     def __iter__(i):
         return iter(i.__dict__)
+
+    def __copy__(self):
+        cls = self.__class__
+        result = cls.__new__(cls)
+        result.__dict__.update(self.__dict__)
+        return result
+
+    def __deepcopy__(self, memo):
+        cls = self.__class__
+        result = cls.__new__(cls)
+        memo[id(self)] = result
+        for k, v in self.__dict__.items():
+            setattr(result, k, copy.deepcopy(v, memo))
+        return result
 
     def update(i,val):
         if type(val) is o:

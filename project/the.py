@@ -7,6 +7,8 @@ import machine
 def init():
     global script
     global load
+    global autoplay
     script=""
     load=machine.Machine.payload
+    autoplay=True
 init()
