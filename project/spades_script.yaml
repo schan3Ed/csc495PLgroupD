@@ -14,6 +14,7 @@ PLAYERS:
     - player4
 PLAYER ATTRIBUTES:
     score : 0
+    points : 0
     hand :
 GAME ATTRIBUTES:
     current player : player1
