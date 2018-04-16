@@ -217,7 +217,7 @@ def g__p05__X_is_empty(args):
     return lambda: len(x1.get()) == 0
 
 def g__p04__X_isnt_X(args):
-    return lambda: not g__p04__X_is_X(args)
+    return lambda: not g__p04__X_is_X(args)()
 
 def g__p04__X_is_X(args):
     x1,x2 = args
