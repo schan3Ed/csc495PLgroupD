@@ -22,22 +22,38 @@ RULES:
     -   when starting
         so new game is started
     -   when new game is started
+        then shuffle draw deck
         then for every player transfer 5 cards from draw deck to hand of player
         so new turn is started
     -   when new turn is started
         if hand of current player is empty
         then increment score of current player
-        then announce "current player has won"
+        then announce current player without new line
+        then announce " has won"
         so new round is started
     -   when new turn is started
         unless hand of current player is empty
+        then current player
+            draws
+                from draw deck
+                into hand of current player
+            or plays
+                from hand of current player 
+                into face deck 
+                where 
+                    rank of choice is rank of top card of draw deck 
+                    or 
+                    suit of choice is suit of top card of draw deck
         then rotate current player
         so new turn is started
-    -   when new round is started
-        if for any player size of hand of player is five
-        then announce "player with highest score wins"
+        when new round is started
         so game is finished
+    # -   when new round is started
+    #     if for any player size of hand of player is five
+    #     then announce "player with highest score wins"
+    #     so game is finished
     # -   when new round is started
     #     unless size of hand of any player is five
     #     then rotate starting player
     #     then for every player reset hand of player
+        # so game is finished 
