@@ -16,21 +16,32 @@ PLAYER ATTRIBUTES:
     score : 0
     hand :
 GAME ATTRIBUTES:
+    highScore : 0
     current player : player1
     starting player: player1
 RULES:
     -   when starting
         so new game is started
+
     -   when new game is started
+        if highScore isnt 5
+        then announce highScore
         then shuffle draw deck
         then for every player transfer 5 cards from draw deck to hand of player
         so new turn is started
+
+    -   when new game is started
+        if highScore is 5
+        so game is finished
+
     -   when new turn is started
         if hand of current player is empty
         then increment score of current player
         then announce current player without new line
         then announce " has won"
-        so new round is started
+        then increment highScore where highScore is less than score of current player
+        so new game is started
+
     -   when new turn is started
         unless hand of current player is empty
         then current player
@@ -46,8 +57,7 @@ RULES:
                     suit of choice is suit of top card of draw deck
         then rotate current player
         so new turn is started
-        when new round is started
-        so game is finished
+
     # -   when new round is started
     #     if for any player size of hand of player is five
     #     then announce "player with highest score wins"
