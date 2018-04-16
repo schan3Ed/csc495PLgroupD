@@ -4,7 +4,7 @@ DECKS:
         shuffle : yes
         hidden: yes
     -   name : face deck
-        contents :
+        contents : []
         shuffle : no
         hidden : no
 PLAYERS:
@@ -25,7 +25,6 @@ RULES:
 
     -   when new game is started
         if highScore isnt 5
-        then announce highScore
         then shuffle draw deck
         then for every player transfer 5 cards from draw deck to hand of player
         so new turn is started
@@ -44,17 +43,18 @@ RULES:
 
     -   when new turn is started
         unless hand of current player is empty
+
         then current player
             draws
                 from draw deck
                 into hand of current player
             or plays
                 from hand of current player 
-                into face deck 
-                where 
-                    rank of choice is rank of top card of draw deck 
-                    or 
-                    suit of choice is suit of top card of draw deck
+                into face deck
+                where
+                    face deck is empty
+                or
+                    rank of choice is rank of top card of draw deck   
         then rotate current player
         so new turn is started
 
