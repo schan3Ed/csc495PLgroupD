@@ -205,10 +205,12 @@ def g__p05__X_is_false(args):
     return lambda:not isTrue(args)
 
 def g__p05__X_is_true(args):
-    x1 = args[0]
-    x1 = buildCommand(x1, guards(), forcematch=False)
-    x1 = x1 or getExpr(args[0])
-    return lambda: x1() if callable(x1) else bool(x1.get()) and x1.get()!=[]
+    def fun(args=args):
+        x1 = args[0]
+        x1 = buildCommand(x1, guards(), forcematch=False)
+        x1 = x1 or getExpr(args[0])
+        return x1() if callable(x1) else bool(x1.get()) and x1.get()!=[]
+    return fun
     
 def g__p05__X_is_empty(args):
     x1 = args[0]
@@ -305,6 +307,16 @@ def a__p03__X_plays_from_X_into_X(args):
         getExpr(x3).get().append(choice)
     return fun
 
+
+def a__p03__X_where_X(args):
+    def fun(args=args):
+        x1,x2=args
+        x1 = buildCommand(x1, actions())
+        x2 = buildCommand(x2, guards())
+        if x2():
+            x1()
+    return fun
+
 def a__p00__transfer_X_cards_from_X_to_X(args):
     def fun(args=args):
         x1, x2, x3 = args
@@ -397,7 +409,7 @@ def a__p00__announce_X(args):
         if x.get() == args[0]:
             x = buildCommand(x.get(), guards(), forcematch=False)()
             print(x)
-            return None
+            return None 
         print(x.get())
         return None
     return fun
@@ -408,7 +420,6 @@ def a__p00__announce_X(args):
 # make sure getters that return a card (aka any instance from any list)
 # have lower priorities than functions that
 # return descriptive values of that card (unless said value is in fact another card)
-
 
 
 def s__p05__bottom_card_of_X(args):
