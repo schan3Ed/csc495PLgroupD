@@ -103,7 +103,8 @@ def run():
     parser = argparse.ArgumentParser(description='Process some integers.')
     parser.add_argument('config', type=str,
                     help='path of config file')
-    with open(parser.parse_args().config, 'r') as file:
+
+    with open(the.config or parser.parse_args().config, 'r') as file:
         the.script=file.read()
 
     precompile()
