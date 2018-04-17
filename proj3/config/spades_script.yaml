@@ -41,6 +41,7 @@ RULES:
 
 
     -   when new round is started
+        then announce "123"
         if for any player hand of player is empty
         then increment score of best player
         so new game is started
