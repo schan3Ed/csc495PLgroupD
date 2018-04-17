@@ -58,6 +58,8 @@ RULES:
                     face deck is empty
                 or
                     rank of choice is rank of top card of face deck
+                or
+                    suit of choice is suit of top card of face deck
         then rotate current player
         so new turn is started
 
