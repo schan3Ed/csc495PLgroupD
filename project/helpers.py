@@ -275,7 +275,7 @@ def a__p05__X_draws_from_X_into_X_or_plays_from_X_into_X(args):
         x1, x2, x3, x4, x5 = args
         choice = choose(getExpr(x4).get()+["draw from %s"%x1], autoplay=the.autoplay)
         if 'draw' in choice:
-            getExpr(x5).get().append(e2.get().pop())
+            getExpr(x3).get().append(getExpr(x2).get().pop())
         else:
             getExpr(x4).get().remove(choice)
             getExpr(x5).get().append(choice)
