@@ -1,0 +1,186 @@
+[35m
+def spec(m, s, t):
+    start = s("starting|>")
+    gamestart = s("new game is started")
+    turnstart = s("new turn is started")
+    roundstart = s("new round is started")
+    end = s("game is finished.")
+    t(start,[m.true],[],gamestart)
+    t(gamestart,[lambda: helpers.buildGuard("highscore isnt 1")()],[lambda: helpers.buildAction("announce \"1\"")(),lambda: helpers.buildAction("for every player transfer 13 cards from draw deck into hand of player")()],roundstart)
+    t(gamestart,[lambda: helpers.buildGuard("highscore is 1")()],[lambda: helpers.buildAction("announce \"2\"")()],end)
+    t(roundstart,[lambda: helpers.buildGuard("for any player hand of player is empty")()],[lambda: helpers.buildAction("announce \"3\"")(),lambda: helpers.buildAction("increment score of best player")(),lambda: helpers.buildAction("increment highscore")()],gamestart)
+    t(roundstart,[lambda: helpers.buildGuard("for any player hand of player is not empty")()],[lambda: helpers.buildAction("counter is now 0")(),lambda: helpers.buildAction("highpoint is now 0")(),lambda: helpers.buildAction("transfer size of face deck cards from face deck into discard deck")(),lambda: helpers.buildAction("announce \"4\"")()],turnstart)
+    t(turnstart,[lambda: helpers.buildGuard("counter is 4")()],[lambda: helpers.buildAction("counter is now 0")(),lambda: helpers.buildAction("increment points of best player")(),lambda: helpers.buildAction("current player is now best player")()],roundstart)
+    t(turnstart,[lambda:not helpers.buildGuard("counter is 4")()],[lambda: helpers.buildAction("announce face deck")(),lambda: helpers.buildAction("current player plays from hand of current player into face deck where face deck is empty or suit of choice is suit of top card of face deck or suit of choice is spades or hand of current player has no card of suit spades and hand of current player has no card of suit suit of top card of face deck")(),lambda: helpers.buildAction("best player is now current player where face deck has no card of suit spades and rank of choice is highest rank in face deck or face deck has card of suit spades and suit of choice is spades and rank of choice is highest rank in face deck of suit spades")(),lambda: helpers.buildAction("announce best player")(),lambda: helpers.buildAction("rotate current player")(),lambda: helpers.buildAction("increment counter")()],turnstart)[0m
+1
+4
+[]
+[7mYou chose 11c from ['13c', '12c', '11c', '10c', '9c', '8c', '7c', '6c', '5c', '4c', '3c', '2c', '1c'][0m
+player1
+['11c']
+[7mYou chose 4d from ['13d', '12d', '11d', '10d', '9d', '8d', '7d', '6d', '5d', '4d', '3d', '2d', '1d'][0m
+player1
+['11c', '4d']
+[7mYou chose 1s from ['13s', '12s', '11s', '10s', '9s', '8s', '7s', '6s', '5s', '4s', '3s', '2s', '1s'][0m
+player1
+['11c', '4d', '1s']
+[7mYou chose 1h from ['13h', '12h', '11h', '10h', '9h', '8h', '7h', '6h', '5h', '4h', '3h', '2h', '1h'][0m
+player1
+4
+[]
+[7mYou chose 12c from ['13c', '12c', '10c', '9c', '8c', '7c', '6c', '5c', '4c', '3c', '2c', '1c'][0m
+player1
+['12c']
+[7mYou chose 9d from ['13d', '12d', '11d', '10d', '9d', '8d', '7d', '6d', '5d', '3d', '2d', '1d'][0m
+player1
+['12c', '9d']
+[7mYou chose 12s from ['13s', '12s', '11s', '10s', '9s', '8s', '7s', '6s', '5s', '4s', '3s', '2s'][0m
+player3
+['12c', '9d', '12s']
+[7mYou chose 6h from ['13h', '12h', '11h', '10h', '9h', '8h', '7h', '6h', '5h', '4h', '3h', '2h'][0m
+player3
+4
+[]
+[7mYou chose 5s from ['13s', '11s', '10s', '9s', '8s', '7s', '6s', '5s', '4s', '3s', '2s'][0m
+player3
+['5s']
+[7mYou chose 5h from ['13h', '12h', '11h', '10h', '9h', '8h', '7h', '5h', '4h', '3h', '2h'][0m
+player3
+['5s', '5h']
+[7mYou chose 1c from ['13c', '10c', '9c', '8c', '7c', '6c', '5c', '4c', '3c', '2c', '1c'][0m
+player3
+['5s', '5h', '1c']
+[7mYou chose 6d from ['13d', '12d', '11d', '10d', '8d', '7d', '6d', '5d', '3d', '2d', '1d'][0m
+player3
+4
+[]
+[7mYou chose 9s from ['13s', '11s', '10s', '9s', '8s', '7s', '6s', '4s', '3s', '2s'][0m
+player3
+['9s']
+[7mYou chose 12h from ['13h', '12h', '11h', '10h', '9h', '8h', '7h', '4h', '3h', '2h'][0m
+player3
+['9s', '12h']
+[7mYou chose 4c from ['13c', '10c', '9c', '8c', '7c', '6c', '5c', '4c', '3c', '2c'][0m
+player3
+['9s', '12h', '4c']
+[7mYou chose 13d from ['13d', '12d', '11d', '10d', '8d', '7d', '5d', '3d', '2d', '1d'][0m
+player3
+4
+[]
+[7mYou chose 4s from ['13s', '11s', '10s', '8s', '7s', '6s', '4s', '3s', '2s'][0m
+player3
+['4s']
+[7mYou chose 4h from ['13h', '11h', '10h', '9h', '8h', '7h', '4h', '3h', '2h'][0m
+player3
+['4s', '4h']
+[7mYou chose 13c from ['13c', '10c', '9c', '8c', '7c', '6c', '5c', '3c', '2c'][0m
+player3
+['4s', '4h', '13c']
+[7mYou chose 2d from ['12d', '11d', '10d', '8d', '7d', '5d', '3d', '2d', '1d'][0m
+player3
+4
+[]
+[7mYou chose 7s from ['13s', '11s', '10s', '8s', '7s', '6s', '3s', '2s'][0m
+player3
+['7s']
+[7mYou chose 9h from ['13h', '11h', '10h', '9h', '8h', '7h', '3h', '2h'][0m
+player3
+['7s', '9h']
+[7mYou chose 9c from ['10c', '9c', '8c', '7c', '6c', '5c', '3c', '2c'][0m
+player3
+['7s', '9h', '9c']
+[7mYou chose 5d from ['12d', '11d', '10d', '8d', '7d', '5d', '3d', '1d'][0m
+player3
+4
+[]
+[7mYou chose 13s from ['13s', '11s', '10s', '8s', '6s', '3s', '2s'][0m
+player3
+['13s']
+[7mYou chose 13h from ['13h', '11h', '10h', '8h', '7h', '3h', '2h'][0m
+player3
+['13s', '13h']
+[7mYou chose 10c from ['10c', '8c', '7c', '6c', '5c', '3c', '2c'][0m
+player3
+['13s', '13h', '10c']
+[7mYou chose 3d from ['12d', '11d', '10d', '8d', '7d', '3d', '1d'][0m
+player3
+4
+[]
+[7mYou chose 3s from ['11s', '10s', '8s', '6s', '3s', '2s'][0m
+player3
+['3s']
+[7mYou chose 11h from ['11h', '10h', '8h', '7h', '3h', '2h'][0m
+player3
+['3s', '11h']
+[7mYou chose 5c from ['8c', '7c', '6c', '5c', '3c', '2c'][0m
+player3
+['3s', '11h', '5c']
+[7mYou chose 1d from ['12d', '11d', '10d', '8d', '7d', '1d'][0m
+player3
+4
+[]
+[7mYou chose 10s from ['11s', '10s', '8s', '6s', '2s'][0m
+player3
+['10s']
+[7mYou chose 3h from ['10h', '8h', '7h', '3h', '2h'][0m
+player3
+['10s', '3h']
+[7mYou chose 8c from ['8c', '7c', '6c', '3c', '2c'][0m
+player3
+['10s', '3h', '8c']
+[7mYou chose 7d from ['12d', '11d', '10d', '8d', '7d'][0m
+player3
+4
+[]
+[7mYou chose 8s from ['11s', '8s', '6s', '2s'][0m
+player3
+['8s']
+[7mYou chose 2h from ['10h', '8h', '7h', '2h'][0m
+player3
+['8s', '2h']
+[7mYou chose 2c from ['7c', '6c', '3c', '2c'][0m
+player3
+['8s', '2h', '2c']
+[7mYou chose 11d from ['12d', '11d', '10d', '8d'][0m
+player3
+4
+[]
+[7mYou chose 6s from ['11s', '6s', '2s'][0m
+player3
+['6s']
+[7mYou chose 10h from ['10h', '8h', '7h'][0m
+player3
+['6s', '10h']
+[7mYou chose 3c from ['7c', '6c', '3c'][0m
+player3
+['6s', '10h', '3c']
+[7mYou chose 12d from ['12d', '10d', '8d'][0m
+player3
+4
+[]
+[7mYou chose 2s from ['11s', '2s'][0m
+player3
+['2s']
+[7mYou chose 7h from ['8h', '7h'][0m
+player3
+['2s', '7h']
+[7mYou chose 7c from ['7c', '6c'][0m
+player3
+['2s', '7h', '7c']
+[7mYou chose 8d from ['10d', '8d'][0m
+player3
+4
+[]
+[7mYou chose 11s from ['11s'][0m
+player3
+['11s']
+[7mYou chose 8h from ['8h'][0m
+player3
+['11s', '8h']
+[7mYou chose 6c from ['6c'][0m
+player3
+['11s', '8h', '6c']
+[7mYou chose 10d from ['10d'][0m
+player3
+3
+2
