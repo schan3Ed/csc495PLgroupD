@@ -301,12 +301,9 @@ def a__p04__X_plays_from_X_into_X_where_X(args):
 def a__p03__X_plays_from_X_into_X(args):
     def fun(args=args):
         x1,x2,x3 = args
-        e1=getExpr(x1)
-        e2=getExpr(x2)
-        e3=getExpr(x3)
-        choice = choose(e2.get(), autoplay=the.autoplay)
-        e2.get().remove(choice)
-        e3.get().append(choice)
+        choice = choose(getExpr(x2).get(), autoplay=the.autoplay)
+        getExpr(x2).get().remove(choice)
+        getExpr(x3).get().append(choice)
     return fun
 
 def a__p00__transfer_X_cards_from_X_to_X(args):
