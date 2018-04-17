@@ -427,7 +427,7 @@ def a__p00__X_is_now_X(args):
     x2=getExpr(x2)
     return lambda: x1.set(x2.get())
 
-def a__p00__reset_X(args): pass # sets x1 to it's initial value set in script
+def a__p00__reset_X(args): pass # TODO: sets x1 to it's initial value set in script
 
 
 def a__p00__shuffle_X(args):
@@ -483,7 +483,7 @@ def s__p02__player_with_highest_X(args):
     def fun(args=args):
         highest=None
         playerWithHighest = None
-        for player in the.script.players:
+        for player in the.script.players
             attrValue = getExpr(player).get()[getExpr(x).get()]
             if highest is None or highest < attrValue:
                 highest = attrValue
