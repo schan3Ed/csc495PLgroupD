@@ -10,5 +10,5 @@ def init():
     global autoplay
     script=""
     load=machine.Machine.payload
-    autoplay=False
+    autoplay=True
 init()

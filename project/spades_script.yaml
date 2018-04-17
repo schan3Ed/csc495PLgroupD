@@ -17,30 +17,52 @@ PLAYER ATTRIBUTES:
     points : 0
     hand :
 GAME ATTRIBUTES:
-    highScore: 5
+    highScore: 0
+    counter : 0
+    highPoint: 0
+    best player: player1
     current player : player1
     starting player: player1
 RULES:
     -   when starting
         so new game is started
     -   when new game is started
-        if highScore isnt 5
+        if highScore isnt 1
         then for every player transfer 13 cards from draw deck to hand of player
         so new round is started
 
+    -   when new game is started
+        if highScore is 1
+        then game is finished
+        
     -   when new round is started
-
-    -   when new turn is started
         if for any player hand of player is empty
-        then increment 
+        then increment score of best player
+        so new game is started
 
     -   when new turn is started
-        unless for any player hand of player is empty
+        if counter is 4
+        then counter is now 0
+        then increment point of best player
+        then current player is now best player
+        
+    -   when new turn is started
+        unless counter is 4
         then current player
             plays
                 from hand of current player
                 into face deck
                 where suit of choice is suit of top card of face deck
-                or suit of coice is spade
+                or suit of choice is spade
+
+        then best player is now
+            current player
+            where rank of top card of face deck is highest in face deck and suit of top card of face deck is spade
+                or rank of top card of face deck is highest and face deck has no suit of spade
+                or suit of top card of face deck is spade and face deck has no spade
+            or best player
+
         then rotate current player
+        then increment counter
         then new turn is started
+    
