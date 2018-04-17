@@ -449,6 +449,18 @@ def s__p06__suit_of_X(args):
 def s__p06__size_of_X(args):
     return lambda:expr(key=len(getExpr(args[0]).get()))
 
+def s__p02__player_with_highest_X(args):
+    def fun(args=args):
+        highest=None
+        playerWithHighest = None
+        for player in the.script.players
+            attrValue = getExpr(player).get()[getExpr(x).get()]
+            if highest is None or highest < attrValue:
+                highest = attrValue
+                playerWithHighest = player
+        return getExpr(player)
+    return fun
+
 def s__p01__ll__X_of_X(args):
     x1,x2 = args
     x2 = getExpr(x2)
