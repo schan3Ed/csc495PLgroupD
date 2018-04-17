@@ -32,17 +32,19 @@ RULES:
         so new game is started
     -   when new game is started
         if highScore isnt 1
-        then for every player transfer 13 cards from draw deck to hand of player
+        then announce "1"
+        then for every player transfer 13 cards from draw deck into hand of player
         so new round is started
 
     -   when new game is started
         if highScore is 1
+        then announce "2"
         so game is finished
 
 
     -   when new round is started
-        then announce "123"
         if for any player hand of player is empty
+        then announce "3"
         then increment score of best player
         so new game is started
     
@@ -51,10 +53,12 @@ RULES:
         then counter is now 0
         then highPoint is now 0
         then transfer size of face deck cards from face deck into discard deck 
+        then announce "4"
         so new turn is started
 
     -   when new turn is started
         if counter is 4 
+        then announce "5"
         then counter is now 0
         then increment point of best player
         then current player is now best player
@@ -62,6 +66,7 @@ RULES:
         
     -   when new turn is started
         unless counter is 4
+        then announce "6"
         then current player
             plays
                 from hand of current player
