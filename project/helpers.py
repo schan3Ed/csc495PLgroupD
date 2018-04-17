@@ -217,6 +217,36 @@ def g__p05__X_is_empty(args):
     x1 = getExpr(x1)
     return lambda: len(x1.get()) == 0
 
+
+
+def g__p05__X_is_highest_rank_in_X(args):
+    def fun(args=args):
+        x1,x2 = args
+        x1 = getExpr(x1).get()
+        x2 = getExpr(x2).get()
+        if False in [x1 >= getRank(card) for card in x2]:
+            return False
+        else:
+            return True
+    return fun
+
+
+def g__p05__X_has_no_card_of_suit_X(args):
+    def fun(args=args):
+        return not g__p05__X_has_card_of_suit_X(args)()
+    return fun
+
+def g__p05__X_has_card_of_suit_X(args):
+    def fun(args=args):
+        x1,x2 = args
+        x1 = getExpr(x1).get()
+        x2 = getExpr(x2).get()
+        if True in [x2 == getSuit(card) for card in x1]:
+            return True
+        else:
+            return False
+    return fun
+
 def g__p04__X_isnt_X(args):
     return lambda: not g__p04__X_is_X(args)()
 
@@ -448,6 +478,18 @@ def s__p06__suit_of_X(args):
 
 def s__p06__size_of_X(args):
     return lambda:expr(key=len(getExpr(args[0]).get()))
+
+def s__p02__player_with_highest_X(args):
+    def fun(args=args):
+        highest=None
+        playerWithHighest = None
+        for player in the.script.players
+            attrValue = getExpr(player).get()[getExpr(x).get()]
+            if highest is None or highest < attrValue:
+                highest = attrValue
+                playerWithHighest = player
+        return getExpr(player)
+    return fun
 
 def s__p01__ll__X_of_X(args):
     x1,x2 = args
