@@ -11,6 +11,6 @@ def init():
     global config
     script=""
     load=machine.Machine.payload
-    autoplay=True
+    autoplay=False
     config=None
 init()

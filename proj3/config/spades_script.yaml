@@ -52,12 +52,8 @@ RULES:
         if for any player hand of player is not empty
         then counter is now 0
         then highPoint is now 0
-<<<<<<< HEAD
-        then transfer size of face deck cards from face deck into discard deck
-=======
         then transfer size of face deck cards from face deck into discard deck 
         then announce "4"
->>>>>>> a24bd6293fd36edcd412be0e463b2866bdf01ed6
         so new turn is started
 
     -   when new turn is started
@@ -70,6 +66,7 @@ RULES:
         
     -   when new turn is started
         unless counter is 4
+        then annoucnes "1"
         then current player
             plays
                 from hand of current player
@@ -81,7 +78,6 @@ RULES:
                 or 
                     suit of choice is spade
 
-        then announce "6"
         then best player is now
             current player
             where 
