@@ -217,6 +217,17 @@ def g__p05__X_is_empty(args):
     x1 = getExpr(x1)
     return lambda: len(x1.get()) == 0
 
+def g__p05__X_is_highest_rank_in_X(args):
+    def fun(args=args):
+        x1,x2 = args
+        x1 = getExpr(x1).get()
+        x2 = getExpr(x2).get()
+        if False in [x1 >= getRank(card) for card in x2]:
+            return False
+        else:
+            return True
+    return fun
+
 def g__p04__X_isnt_X(args):
     return lambda: not g__p04__X_is_X(args)()
 
