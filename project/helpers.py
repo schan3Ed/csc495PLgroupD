@@ -257,17 +257,17 @@ def a__p06__X_draws_from_X_into_X_or_plays_from_X_into_X_where_X(args):
     def fun(args=args):
         x1,x2,x3,x4,x5,x6 = args
         isTrue = lambda x: g__p05__X_is_true([x])()
-        play = lambda x: choose(getExpr(x4).get()+["draw from %s"%x1], autoplay=the.autoplay)
+        play = lambda: choose(getExpr(x4).get()+["draw from %s"%x1], autoplay=the.autoplay)
         # backupEnvironment = copy.deepcopy(the.load)
         play()
         while not isTrue(x6) and 'draw' not in the.load.choice:
             print(colors.red("The requirement '%s' was not met. Try again."%x6))
             play()
-        if 'draw' in choice:
+        if 'draw' in the.load.choice:
             getExpr(x5).get().append(getExpr(x2).get().pop())
         else:
-            getExpr(x4).get().remove(choice)
-            getExpr(x5).get().append(choice)
+            getExpr(x4).get().remove(the.load.choice)
+            getExpr(x5).get().append(the.load.choice)
     return fun
 
 def a__p05__X_draws_from_X_into_X_or_plays_from_X_into_X(args):
