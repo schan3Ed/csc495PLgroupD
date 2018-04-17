@@ -392,7 +392,7 @@ def a__p04__X_plays_from_X_into_X_where_X(args):
         backupEnvironment = copy.deepcopy(the.load)
         play()
         while not isTrue(x4):
-            print(colors.red("The requirement '%s' was not met. Try again." % x6))
+            print(colors.red("The requirement '%s' was not met. Try again." % x4))
             play()
         getExpr(x2).get().remove(the.load.choice)
         getExpr(x3).get().append(the.load.choice)
