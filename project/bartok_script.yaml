@@ -16,6 +16,7 @@ PLAYER ATTRIBUTES:
     score : 0
     hand :
 GAME ATTRIBUTES:
+    temp: 
     highScore : 0
     current player : player1
     starting player: player1
@@ -47,6 +48,8 @@ RULES:
         then announce current player
         then announce "Face Deck " without new line
         then announce face deck
+        then announce "Draw Deck " without new line
+        then announce draw deck
         then current player
             draws
                 from draw deck

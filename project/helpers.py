@@ -207,8 +207,7 @@ def g__p05__X_is_false(args):
 def g__p05__X_is_true(args):
     x1 = args[0]
     x1 = buildCommand(x1, guards(), forcematch=False)
-    x1 = x1 or args[0]
-    x1 = getExpr(x1)
+    x1 = x1 or getExpr(args[0])
     return lambda: x1() if callable(x1) else bool(x1.get()) and x1.get()!=[]
     
 def g__p05__X_is_empty(args):
@@ -307,12 +306,15 @@ def a__p03__X_plays_from_X_into_X(args):
     return fun
 
 def a__p00__transfer_X_cards_from_X_to_X(args):
-    x1, x2, x3 = args
-    x1 = getExpr(x1)
-    x2 = getExpr(x2)
-    x3 = getExpr(x3)
-    # lists are mutable so x3.get() is okay. but in most cases, x3.set would be necessary to update the actual payload value
-    return lambda: [x3.get().append(x2.get().pop()) for i in range(x1.get())]
+    def fun(args=args):
+        x1, x2, x3 = args
+        x1 = getExpr(x1)
+        x2 = getExpr(x2)
+        x3 = getExpr(x3)
+        for i in range(x1.get()):
+            x3.get().append(x2.get().pop())
+        # lists are mutable so x3.get() is okay. but in most cases, x3.set would be necessary to update the actual payload value
+    return fun
 
 def a__p00__increment_X(args): 
     def fun():
@@ -354,6 +356,21 @@ def a__p01__with_the_color_X_announce_X(args):
     x2 = x2[1:-1] if isQuoted else getExpr(x2)
     return lambda: print(color(x2 if isQuoted else x2.get()))
 
+# example usage
+# move bottom card of face deck from face deck to bottom/top of draw deck
+def a__p00__move_X_from_X_to_X_of_X(args):
+    def fun(args=args):
+        card,fromDeck,sideOfToDeck,toDeck = args
+        card = getExpr(card).get()
+        getExpr(fromDeck).get().remove(card)
+        if sideOfToDeck == 'top':
+            getExpr(toDeck).get().append(card)
+        elif sideOfToDeck == 'bottom':
+            getExpr(toDeck).get().append(card)
+        else:
+            raise Exception('you must specify the side of the deck for which to move the card')
+    return fun
+
 def a__p00__X_is_now_X(args):
     x1,x2 = args
     x1=getExpr(x1)
@@ -393,6 +410,10 @@ def a__p00__announce_X(args):
 # return descriptive values of that card (unless said value is in fact another card)
 
 
+
+def s__p05__bottom_card_of_X(args):
+    x1=args[0]
+    return lambda: expr(key=getExpr(x1).get()[0])
 
 def s__p05__top_card_of_X(args):
     x1=args[0]
