@@ -365,46 +365,6 @@ def a__p00__X_is_now_X(args):
 
 def a__p00__reset_X(args): pass # sets x1 to it's initial value set in script
 
-<<<<<<< HEAD
-def a__p01__announce_X_without_new_line(args):
-    def fun(args=args):
-        x = args[0]
-        isQuoted = bool(x[0] is '"' and x[-1] is '"')
-        if isQuoted:
-            x = x[1:-1]
-            print(x)
-            return None
-        x = getExpr(x)
-        if x.get() == args[0]:
-            x = buildCommand(x.get(), guards(), forcematch=False)()
-            print(x)
-            return None
-        print(x.get(), end="")
-        return None
-    return fun
-
-def a__p01__with_the_color_X_announce_X(args):
-    def fun(args=args):
-        color, x = args
-        if x1 in colors.COLORS:
-            color = lambda x: partial(colors.color, fg=x1)(str(x))
-        elif x1 in colors.STYLES:
-            color = lambda x: partial(colors.color, style=x1)(str(x))
-        isQuoted = bool(x[0] is '"' and x[-1] is '"')
-        if isQuoted:
-            x = x[1:-1]
-            print(color(x))
-            return None
-        x = getExpr(x)
-        if x.get() == args[1]:
-            x = buildCommand(x.get(), guards(), forcematch=False)()
-            print(color(x))
-            return None
-        print(color(x.get()))
-        return None
-    return fun
-=======
->>>>>>> 1f6128945e536ac775cdca0c58d65794ca8c42bc
 
 def a__p00__shuffle_X(args):
     x = args[0]
