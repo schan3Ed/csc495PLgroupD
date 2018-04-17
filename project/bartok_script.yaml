@@ -16,8 +16,6 @@ PLAYER ATTRIBUTES:
     score : 0
     hand :
 GAME ATTRIBUTES:
-    temp: 
-    highScore : 1
     current player : player1
     starting player: player1
 RULES:
@@ -25,17 +23,9 @@ RULES:
         so new game is started
 
     -   when new game is started
-        if highScore isnt 1
         then shuffle draw deck
         then for every player transfer 5 cards from draw deck to hand of player
         so new turn is started
-
-    -   when new game is started
-        if highScore is 1
-        then for every player announce player without new line where score of player is highScore
-        then for every player announce " has won"              where score of player is highScore
-        so game is finished
-
 
     -   when new turn is started
         if draw deck is empty 
@@ -48,8 +38,7 @@ RULES:
         then increment score of current player
         then announce current player without new line
         then announce " has won"
-        then increment highScore where highScore is less than score of current player
-        so new game is started
+        so game is finished
 
     -   when new turn is started
         unless hand of current player is empty
