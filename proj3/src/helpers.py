@@ -270,7 +270,7 @@ def g__p05__X_is_empty(args):
 
 def g__p05__X_is_highest_rank_in_X_of_suit_X(args):
     def fun(args=args):
-        x1, x2 = args
+        x1, x2, x3 = args
         x1 = getExpr(x1).get()
         x2 = getExpr(x2).get()
         x3 = getExpr(x3).get()

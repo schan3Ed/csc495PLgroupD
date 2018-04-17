@@ -60,7 +60,7 @@ RULES:
         if counter is 4 
         then announce "5"
         then counter is now 0
-        then increment point of best player
+        then increment points of best player
         then current player is now best player
         so new round is started
         
@@ -77,7 +77,7 @@ RULES:
                 or
                     suit of choice is suit of top card of face deck
                 or 
-                    suit of choice is spade
+                    suit of choice is spades
                 or
                         hand of current player has no card of suit spades
                     and
