@@ -388,7 +388,7 @@ def a__p04__X_plays_from_X_into_X_where_X(args):
     def fun(args=args):
         x1, x2, x3, x4 = args
         isTrue = lambda x: g__p05__X_is_true([x])()
-        play = lambda: choose(['draw']+getExpr(x2).get(), autoplay=the.autoplay)
+        play = lambda: choose(getExpr(x2).get(), autoplay=the.autoplay)
         backupEnvironment = copy.deepcopy(the.load)
         play()
         while not isTrue(x4):

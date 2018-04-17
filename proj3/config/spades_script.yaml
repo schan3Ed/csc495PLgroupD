@@ -65,6 +65,7 @@ RULES:
         so new round is started
         
     -   when new turn is started
+        then announce "6"
         unless counter is 4
         then current player
             plays
@@ -72,12 +73,11 @@ RULES:
                 into face deck
                 where
                     face deck is empty
-                or 
+                or
                     suit of choice is suit of top card of face deck
                 or 
                     suit of choice is spade
 
-        then announce "6"
         then best player is now
             current player
             where 
