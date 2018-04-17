@@ -58,16 +58,15 @@ RULES:
 
     -   when new turn is started
         if counter is 4 
-        then announce "5"
         then counter is now 0
-        then increment point of best player
+        then increment points of best player
         then current player is now best player
         so new round is started
         
     -   when new turn is started
-        then announce "6"
         unless counter is 4
-        then annoucnes "1"
+        then log
+        then announce face deck
         then current player
             plays
                 from hand of current player
@@ -77,8 +76,11 @@ RULES:
                 or
                     suit of choice is suit of top card of face deck
                 or 
-                    suit of choice is spade
-
+                    suit of choice is spades
+                or
+                        hand of current player has no card of suit spades
+                    and
+                        hand of current player has no card of suit suit of top card of face deck
         then best player is now
             current player
             where 
@@ -91,7 +93,6 @@ RULES:
                         suit of choice is spades
                     and 
                         rank of choice is highest rank in face deck of suit spades
-
         then rotate current player
         then increment counter
         so new turn is started

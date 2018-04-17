@@ -163,7 +163,21 @@ def getRank(card):
     except Exception as e:
         return None
 
-
+def getRankValue(card, isRank=None):
+    isRank = isRank or False
+    rankMap = o({
+        'jack'  : 11,
+        'queen' : 12,
+        'king'  : 13
+    })
+    if isRank:
+        x = card
+    else:
+        x = getRank(card)
+    if type(x) is str:
+        return rankMap[x]
+    else:
+        return x
 # #################################################
 # ############### HELPER FUNCTIONS ################
 # #################################################
@@ -260,7 +274,7 @@ def g__p05__X_is_highest_rank_in_X_of_suit_X(args):
         x1 = getExpr(x1).get()
         x2 = getExpr(x2).get()
         x3 = getExpr(x3).get()
-        if False in [x1 >= getRank(card) for card in x2 if getSuit(x3)]:
+        if False in [getRankValue(x1, isRank=True) >= getRankValue(card) for card in x2 if getSuit(x3)]:
             return False
         else:
             return True
@@ -273,7 +287,7 @@ def g__p05__X_is_highest_rank_in_X(args):
         x1, x2 = args
         x1 = getExpr(x1).get()
         x2 = getExpr(x2).get()
-        if False in [x1 >= getRank(card) for card in x2]:
+        if False in [getRankValue(x1, isRank=True) >= getRankValue(card) for card in x2]:
             return False
         else:
             return True
