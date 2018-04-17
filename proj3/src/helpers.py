@@ -245,6 +245,8 @@ def g__p05__X_is_true(args):
 
     return fun
 
+def g__p05__X_is_not_empty(args):
+    return lambda: not g__p05__X_is_empty(args)()
 
 def g__p05__X_is_empty(args):
     x1 = args[0]
