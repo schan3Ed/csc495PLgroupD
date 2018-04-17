@@ -65,7 +65,6 @@ RULES:
         
     -   when new turn is started
         unless counter is 4
-        then log
         then announce face deck
         then current player
             plays
@@ -93,6 +92,7 @@ RULES:
                         suit of choice is spades
                     and 
                         rank of choice is highest rank in face deck of suit spades
+        then announce best player
         then rotate current player
         then increment counter
         so new turn is started
