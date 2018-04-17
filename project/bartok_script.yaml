@@ -57,6 +57,8 @@ RULES:
                 where
                     face deck is empty
                 or
+                    choice is draw
+                or
                     rank of choice is rank of top card of face deck
                 or
                     suit of choice is suit of top card of face deck
