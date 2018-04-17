@@ -237,10 +237,18 @@ def g__p05__X_is_less_than_X(args):
 # #################################################
 
 def a__p10__for_every_player_X_where_X(args):
-    x1,x2=args
-    isTrue = lambda x: g__p05__X_is_true([x])()
-    forEveryPlayer = lambda x: a__p09__for_every_player_X(x)()
-    return lambda: forEveryPlayer(x1) if isTrue(x2) else None
+    def fun(args=args):
+        x1,x2=args
+        isTrue = lambda x: g__p05__X_is_true([x])
+        playerActions = [re.sub(r"\bplayer\b", player, x1) for player in the.script.players]
+        playerGuards =  [re.sub(r"\bplayer\b", player, x2) for player in the.script.players]
+        playerActions = [buildAction(action) for action in playerActions]
+        playerGuards =  [isTrue(guard) for guard in playerGuards]
+        for i in range(len(playerActions)):
+            if playerGuards[i]():
+                playerActions[i]()
+    return fun
+
 
 def a__p09__for_every_player_X(args): # builds and calls an action to perform once for every player by calling buildAction and providing one version of the text each time, but with the word 'player' replaced with player names like 'player1' 'player2' etc
     x1=args[0]

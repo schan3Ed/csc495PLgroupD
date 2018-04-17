@@ -38,9 +38,9 @@ def initload():
             the.load[deck.name] = deck.contents
     if 'players' in the.script.__dict__:
         for player in the.script.players:
-            the.load[player] = deck.contents
             if 'player attributes' in the.script.__dict__:
                 the.load[player] = copy.deepcopy(the.script['player attributes'])
+                the.load[player].name=player
     if 'game attributes' in the.script.__dict__:
             for key,val in the.script['game attributes'].items():
                 the.load[key] = val
