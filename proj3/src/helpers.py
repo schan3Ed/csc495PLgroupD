@@ -424,7 +424,7 @@ def a__p03__X_where_X(args):
     return fun
 
 
-def a__p00__transfer_X_cards_from_X_to_X(args):
+def a__p00__transfer_X_cards_from_X_into_X(args):
     def fun(args=args):
         x1, x2, x3 = args
         x1 = getExpr(x1)
