@@ -30,6 +30,7 @@ GAME ATTRIBUTES:
 RULES:
     -   when starting
         so new game is started
+
     -   when new game is started
         if highScore isnt 1
         then for every player transfer 13 cards from draw deck to hand of player
@@ -39,9 +40,7 @@ RULES:
         if highScore is 1
         so game is finished
 
-
     -   when new round is started
-        then announce "123"
         if for any player hand of player is empty
         then increment score of best player
         so new game is started
@@ -50,7 +49,7 @@ RULES:
         if for any player hand of player is not empty
         then counter is now 0
         then highPoint is now 0
-        then transfer size of face deck cards from face deck into discard deck 
+        then transfer size of face deck cards from face deck into discard deck
         so new turn is started
 
     -   when new turn is started
