@@ -33,6 +33,7 @@ RULES:
     -   when new game is started
         if highScore isnt 1
         then announce "1"
+        then transfer size of discard deck cards into draw deck
         then for every player transfer 13 cards from draw deck into hand of player
         so new round is started
 
