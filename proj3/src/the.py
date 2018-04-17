@@ -8,7 +8,9 @@ def init():
     global script
     global load
     global autoplay
+    global config
     script=""
     load=machine.Machine.payload
     autoplay=True
+    config=None
 init()
