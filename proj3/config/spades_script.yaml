@@ -34,7 +34,6 @@ RULES:
     -   when new game is started
         if highScore isnt 1
         then announce "1"
-        then transfer size of discard deck cards into draw deck
         then for every player transfer 13 cards from draw deck into hand of player
         so new round is started
 
@@ -47,6 +46,7 @@ RULES:
         if for any player hand of player is empty
         then announce "3"
         then increment score of best player
+        then increment highScore
         so new game is started
     
     -   when new round is started

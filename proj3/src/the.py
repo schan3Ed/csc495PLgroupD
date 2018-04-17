@@ -11,6 +11,6 @@ def init():
     global config
     script="../config/bartok_script.yaml"
     load=machine.Machine.payload
-    autoplay=False
+    autoplay=True
     config=None
 init()
