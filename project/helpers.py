@@ -264,7 +264,7 @@ def a__p06__X_draws_from_X_into_X_or_plays_from_X_into_X_where_X(args):
             print(colors.red("The requirement '%s' was not met. Try again."%x6))
             play()
         if 'draw' in the.load.choice:
-            getExpr(x5).get().append(getExpr(x2).get().pop())
+            getExpr(x3).get().append(getExpr(x2).get().pop())
         else:
             getExpr(x4).get().remove(the.load.choice)
             getExpr(x5).get().append(the.load.choice)
