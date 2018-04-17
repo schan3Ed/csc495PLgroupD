@@ -1,6 +1,6 @@
 # vim: set filetype=python ts=4 sw=2 sts=2 expandtab:
 # yaml install instructions: Run pycharm as administrator, open terminal window/view, and execute "pip3 install pyyaml"
-import sys, re, traceback, time, random, json, yaml, copy
+import sys, re, traceback, time, random, json, yaml, copy, argparse
 from machine import *
 # from actions import *
 # from bartok import *
@@ -99,7 +99,11 @@ def spec(m, s, t):"""
 
 # specifies which script to compile, compiles it, and runs it
 def run():
-    with open('bartok_script.yaml', 'r') as file:
+    st = ""
+    parser = argparse.ArgumentParser(description='Process some integers.')
+    parser.add_argument('config', type=str,
+                    help='path of config file')
+    with open(parser.parse_args().config, 'r') as file:
         the.script=file.read()
 
     precompile()
