@@ -9,7 +9,7 @@ def init():
     global load
     global autoplay
     global config
-    script=""
+    script="../config/bartok_script.yaml"
     load=machine.Machine.payload
     autoplay=False
     config=None
