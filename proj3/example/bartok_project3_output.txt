@@ -1,0 +1,553 @@
+##  Using the config file, we can generate a state diagram that look like the following
+
+To generate this. Run python /src/__main__.py ../config/bartok_script.yaml
+
+The idea is to parse a config file with our own language that is human readable and generate a machine with preset state and
+transaction. We believe that every card games can be implemented with this state machine. Then we convert human readable
+language into different lambda function. At the end, we run the state machine and the game runs. Viola
+
+[35m
+def spec(m, s, t):
+    start = s("starting|>")
+    gamestart = s("new game is started")
+    turnstart = s("new turn is started")
+    roundstart = s("new round is started")
+    end = s("game is finished.")
+    t(start,[m.true],[],gamestart)
+    t(gamestart,[m.true],[lambda: helpers.buildAction("shuffle draw deck")(),lambda: helpers.buildAction("for every player transfer 5 cards from draw deck to hand of player")()],turnstart)
+    t(turnstart,[lambda: helpers.buildGuard("draw deck is empty")()],[lambda: helpers.buildAction("move bottom card of face deck from face deck to top of draw deck")(),lambda: helpers.buildAction("shuffle draw deck")()],turnstart)
+    t(turnstart,[lambda: helpers.buildGuard("hand of current player is empty")()],[lambda: helpers.buildAction("increment score of current player")(),lambda: helpers.buildAction("announce current player without new line")(),lambda: helpers.buildAction("announce \" has won\"")()],end)
+    t(turnstart,[lambda:not helpers.buildGuard("hand of current player is empty")()],[lambda: helpers.buildAction("announce \"current player \" without new line")(),lambda: helpers.buildAction("announce current player")(),lambda: helpers.buildAction("announce \"face deck \" without new line")(),lambda: helpers.buildAction("announce face deck")(),lambda: helpers.buildAction("announce \"draw deck \" without new line")(),lambda: helpers.buildAction("announce draw deck")(),lambda: helpers.buildAction("current player draws from draw deck into hand of current player or plays from hand of current player into face deck where face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck")(),lambda: helpers.buildAction("rotate current player")()],turnstart)[0m
+
+
+## The following is a auto play through of Bartok. The card selected is by random. Roughly 2000 turns were took including invalid options.
+
+current player player1
+face deck []
+draw deck ['11c', '10h', '12d', '10s', '3h', '13d', '7s', '12h', '10d', '6h', '4d', '13c', '5c', '3s', '11s', '8c', '9c', '9s', '2c', '1c', '13h', '12c', '7d', '8s', '13s', '1d', '9d', '11h', '8d', '4h', '6s', '2s']
+[7mYou chose 9h from ['draw', '9h', '11d', '10c', '5h', '4s'][0m
+current player player2
+face deck ['9h']
+draw deck ['11c', '10h', '12d', '10s', '3h', '13d', '7s', '12h', '10d', '6h', '4d', '13c', '5c', '3s', '11s', '8c', '9c', '9s', '2c', '1c', '13h', '12c', '7d', '8s', '13s', '1d', '9d', '11h', '8d', '4h', '6s', '2s']
+[7mYou chose 3c from ['draw', '8h', '6d', '3d', '5d', '3c'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 3c from ['draw', '8h', '6d', '3d', '5d', '3c'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 6d from ['draw', '8h', '6d', '3d', '5d', '3c'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose draw from ['draw', '8h', '6d', '3d', '5d', '3c'][0m
+current player player3
+face deck ['9h']
+draw deck ['11c', '10h', '12d', '10s', '3h', '13d', '7s', '12h', '10d', '6h', '4d', '13c', '5c', '3s', '11s', '8c', '9c', '9s', '2c', '1c', '13h', '12c', '7d', '8s', '13s', '1d', '9d', '11h', '8d', '4h', '6s']
+[7mYou chose 2h from ['draw', '12s', '1s', '7h', '7c', '2h'][0m
+current player player4
+face deck ['9h', '2h']
+draw deck ['11c', '10h', '12d', '10s', '3h', '13d', '7s', '12h', '10d', '6h', '4d', '13c', '5c', '3s', '11s', '8c', '9c', '9s', '2c', '1c', '13h', '12c', '7d', '8s', '13s', '1d', '9d', '11h', '8d', '4h', '6s']
+[7mYou chose 2d from ['draw', '4c', '2d', '1h', '6c', '5s'][0m
+current player player1
+face deck ['9h', '2h', '2d']
+draw deck ['11c', '10h', '12d', '10s', '3h', '13d', '7s', '12h', '10d', '6h', '4d', '13c', '5c', '3s', '11s', '8c', '9c', '9s', '2c', '1c', '13h', '12c', '7d', '8s', '13s', '1d', '9d', '11h', '8d', '4h', '6s']
+[7mYou chose 4s from ['draw', '11d', '10c', '5h', '4s'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 5h from ['draw', '11d', '10c', '5h', '4s'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 4s from ['draw', '11d', '10c', '5h', '4s'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 11d from ['draw', '11d', '10c', '5h', '4s'][0m
+current player player2
+face deck ['9h', '2h', '2d', '11d']
+draw deck ['11c', '10h', '12d', '10s', '3h', '13d', '7s', '12h', '10d', '6h', '4d', '13c', '5c', '3s', '11s', '8c', '9c', '9s', '2c', '1c', '13h', '12c', '7d', '8s', '13s', '1d', '9d', '11h', '8d', '4h', '6s']
+[7mYou chose 6d from ['draw', '8h', '6d', '3d', '5d', '3c', '2s'][0m
+current player player3
+face deck ['9h', '2h', '2d', '11d', '6d']
+draw deck ['11c', '10h', '12d', '10s', '3h', '13d', '7s', '12h', '10d', '6h', '4d', '13c', '5c', '3s', '11s', '8c', '9c', '9s', '2c', '1c', '13h', '12c', '7d', '8s', '13s', '1d', '9d', '11h', '8d', '4h', '6s']
+[7mYou chose 1s from ['draw', '12s', '1s', '7h', '7c'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 7c from ['draw', '12s', '1s', '7h', '7c'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 7h from ['draw', '12s', '1s', '7h', '7c'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 7c from ['draw', '12s', '1s', '7h', '7c'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 7h from ['draw', '12s', '1s', '7h', '7c'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 7c from ['draw', '12s', '1s', '7h', '7c'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose draw from ['draw', '12s', '1s', '7h', '7c'][0m
+current player player4
+face deck ['9h', '2h', '2d', '11d', '6d']
+draw deck ['11c', '10h', '12d', '10s', '3h', '13d', '7s', '12h', '10d', '6h', '4d', '13c', '5c', '3s', '11s', '8c', '9c', '9s', '2c', '1c', '13h', '12c', '7d', '8s', '13s', '1d', '9d', '11h', '8d', '4h']
+[7mYou chose 6c from ['draw', '4c', '1h', '6c', '5s'][0m
+current player player1
+face deck ['9h', '2h', '2d', '11d', '6d', '6c']
+draw deck ['11c', '10h', '12d', '10s', '3h', '13d', '7s', '12h', '10d', '6h', '4d', '13c', '5c', '3s', '11s', '8c', '9c', '9s', '2c', '1c', '13h', '12c', '7d', '8s', '13s', '1d', '9d', '11h', '8d', '4h']
+[7mYou chose 10c from ['draw', '10c', '5h', '4s'][0m
+current player player2
+face deck ['9h', '2h', '2d', '11d', '6d', '6c', '10c']
+draw deck ['11c', '10h', '12d', '10s', '3h', '13d', '7s', '12h', '10d', '6h', '4d', '13c', '5c', '3s', '11s', '8c', '9c', '9s', '2c', '1c', '13h', '12c', '7d', '8s', '13s', '1d', '9d', '11h', '8d', '4h']
+[7mYou chose 2s from ['draw', '8h', '3d', '5d', '3c', '2s'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 5d from ['draw', '8h', '3d', '5d', '3c', '2s'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 5d from ['draw', '8h', '3d', '5d', '3c', '2s'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 2s from ['draw', '8h', '3d', '5d', '3c', '2s'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 8h from ['draw', '8h', '3d', '5d', '3c', '2s'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 3d from ['draw', '8h', '3d', '5d', '3c', '2s'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 3c from ['draw', '8h', '3d', '5d', '3c', '2s'][0m
+current player player3
+face deck ['9h', '2h', '2d', '11d', '6d', '6c', '10c', '3c']
+draw deck ['11c', '10h', '12d', '10s', '3h', '13d', '7s', '12h', '10d', '6h', '4d', '13c', '5c', '3s', '11s', '8c', '9c', '9s', '2c', '1c', '13h', '12c', '7d', '8s', '13s', '1d', '9d', '11h', '8d', '4h']
+[7mYou chose 6s from ['draw', '12s', '1s', '7h', '7c', '6s'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 6s from ['draw', '12s', '1s', '7h', '7c', '6s'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 6s from ['draw', '12s', '1s', '7h', '7c', '6s'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 1s from ['draw', '12s', '1s', '7h', '7c', '6s'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose draw from ['draw', '12s', '1s', '7h', '7c', '6s'][0m
+current player player4
+face deck ['9h', '2h', '2d', '11d', '6d', '6c', '10c', '3c']
+draw deck ['11c', '10h', '12d', '10s', '3h', '13d', '7s', '12h', '10d', '6h', '4d', '13c', '5c', '3s', '11s', '8c', '9c', '9s', '2c', '1c', '13h', '12c', '7d', '8s', '13s', '1d', '9d', '11h', '8d']
+[7mYou chose 5s from ['draw', '4c', '1h', '5s'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose draw from ['draw', '4c', '1h', '5s'][0m
+current player player1
+face deck ['9h', '2h', '2d', '11d', '6d', '6c', '10c', '3c']
+draw deck ['11c', '10h', '12d', '10s', '3h', '13d', '7s', '12h', '10d', '6h', '4d', '13c', '5c', '3s', '11s', '8c', '9c', '9s', '2c', '1c', '13h', '12c', '7d', '8s', '13s', '1d', '9d', '11h']
+[7mYou chose draw from ['draw', '5h', '4s'][0m
+current player player2
+face deck ['9h', '2h', '2d', '11d', '6d', '6c', '10c', '3c']
+draw deck ['11c', '10h', '12d', '10s', '3h', '13d', '7s', '12h', '10d', '6h', '4d', '13c', '5c', '3s', '11s', '8c', '9c', '9s', '2c', '1c', '13h', '12c', '7d', '8s', '13s', '1d', '9d']
+[7mYou chose 2s from ['draw', '8h', '3d', '5d', '2s'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 5d from ['draw', '8h', '3d', '5d', '2s'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 3d from ['draw', '8h', '3d', '5d', '2s'][0m
+current player player3
+face deck ['9h', '2h', '2d', '11d', '6d', '6c', '10c', '3c', '3d']
+draw deck ['11c', '10h', '12d', '10s', '3h', '13d', '7s', '12h', '10d', '6h', '4d', '13c', '5c', '3s', '11s', '8c', '9c', '9s', '2c', '1c', '13h', '12c', '7d', '8s', '13s', '1d', '9d']
+[7mYou chose 7h from ['draw', '12s', '1s', '7h', '7c', '6s', '4h'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 6s from ['draw', '12s', '1s', '7h', '7c', '6s', '4h'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose draw from ['draw', '12s', '1s', '7h', '7c', '6s', '4h'][0m
+current player player4
+face deck ['9h', '2h', '2d', '11d', '6d', '6c', '10c', '3c', '3d']
+draw deck ['11c', '10h', '12d', '10s', '3h', '13d', '7s', '12h', '10d', '6h', '4d', '13c', '5c', '3s', '11s', '8c', '9c', '9s', '2c', '1c', '13h', '12c', '7d', '8s', '13s', '1d']
+[7mYou chose 5s from ['draw', '4c', '1h', '5s', '8d'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose draw from ['draw', '4c', '1h', '5s', '8d'][0m
+current player player1
+face deck ['9h', '2h', '2d', '11d', '6d', '6c', '10c', '3c', '3d']
+draw deck ['11c', '10h', '12d', '10s', '3h', '13d', '7s', '12h', '10d', '6h', '4d', '13c', '5c', '3s', '11s', '8c', '9c', '9s', '2c', '1c', '13h', '12c', '7d', '8s', '13s']
+[7mYou chose 4s from ['draw', '5h', '4s', '11h'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 11h from ['draw', '5h', '4s', '11h'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 5h from ['draw', '5h', '4s', '11h'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 5h from ['draw', '5h', '4s', '11h'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 5h from ['draw', '5h', '4s', '11h'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose draw from ['draw', '5h', '4s', '11h'][0m
+current player player2
+face deck ['9h', '2h', '2d', '11d', '6d', '6c', '10c', '3c', '3d']
+draw deck ['11c', '10h', '12d', '10s', '3h', '13d', '7s', '12h', '10d', '6h', '4d', '13c', '5c', '3s', '11s', '8c', '9c', '9s', '2c', '1c', '13h', '12c', '7d', '8s']
+[7mYou chose 8h from ['draw', '8h', '5d', '2s'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 8h from ['draw', '8h', '5d', '2s'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 2s from ['draw', '8h', '5d', '2s'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 5d from ['draw', '8h', '5d', '2s'][0m
+current player player3
+face deck ['9h', '2h', '2d', '11d', '6d', '6c', '10c', '3c', '3d', '5d']
+draw deck ['11c', '10h', '12d', '10s', '3h', '13d', '7s', '12h', '10d', '6h', '4d', '13c', '5c', '3s', '11s', '8c', '9c', '9s', '2c', '1c', '13h', '12c', '7d', '8s']
+[7mYou chose 6s from ['draw', '12s', '1s', '7h', '7c', '6s', '4h', '9d'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 9d from ['draw', '12s', '1s', '7h', '7c', '6s', '4h', '9d'][0m
+current player player4
+face deck ['9h', '2h', '2d', '11d', '6d', '6c', '10c', '3c', '3d', '5d', '9d']
+draw deck ['11c', '10h', '12d', '10s', '3h', '13d', '7s', '12h', '10d', '6h', '4d', '13c', '5c', '3s', '11s', '8c', '9c', '9s', '2c', '1c', '13h', '12c', '7d', '8s']
+[7mYou chose 1h from ['draw', '4c', '1h', '5s', '8d', '1d'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 1d from ['draw', '4c', '1h', '5s', '8d', '1d'][0m
+current player player1
+face deck ['9h', '2h', '2d', '11d', '6d', '6c', '10c', '3c', '3d', '5d', '9d', '1d']
+draw deck ['11c', '10h', '12d', '10s', '3h', '13d', '7s', '12h', '10d', '6h', '4d', '13c', '5c', '3s', '11s', '8c', '9c', '9s', '2c', '1c', '13h', '12c', '7d', '8s']
+[7mYou chose 13s from ['draw', '5h', '4s', '11h', '13s'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 13s from ['draw', '5h', '4s', '11h', '13s'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose draw from ['draw', '5h', '4s', '11h', '13s'][0m
+current player player2
+face deck ['9h', '2h', '2d', '11d', '6d', '6c', '10c', '3c', '3d', '5d', '9d', '1d']
+draw deck ['11c', '10h', '12d', '10s', '3h', '13d', '7s', '12h', '10d', '6h', '4d', '13c', '5c', '3s', '11s', '8c', '9c', '9s', '2c', '1c', '13h', '12c', '7d']
+[7mYou chose 8h from ['draw', '8h', '2s'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 2s from ['draw', '8h', '2s'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 2s from ['draw', '8h', '2s'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose draw from ['draw', '8h', '2s'][0m
+
+[7mYou chose 1c from ['draw', '6d', '1c'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 1c from ['draw', '6d', '1c'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 1c from ['draw', '6d', '1c'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 6d from ['draw', '6d', '1c'][0m
+current player player1
+face deck ['10h', '11h', '8h', '12h', '5h', '7h', '6h', '1h', '13h', '4h', '4s', '4d', '3d', '12d', '12s', '13s', '2s', '1s', '5s', '11s', '6s', '9s', '7s', '7d', '9d', '9h', '9c', '7c', '11c', '8c', '4c', '5c', '5d', '11d', '13d', '2d', '6d']
+draw deck ['3h']
+[7mYou chose 6c from ['draw', '10d', '8d', '6c'][0m
+current player player2
+face deck ['10h', '11h', '8h', '12h', '5h', '7h', '6h', '1h', '13h', '4h', '4s', '4d', '3d', '12d', '12s', '13s', '2s', '1s', '5s', '11s', '6s', '9s', '7s', '7d', '9d', '9h', '9c', '7c', '11c', '8c', '4c', '5c', '5d', '11d', '13d', '2d', '6d', '6c']
+draw deck ['3h']
+[7mYou chose 13c from ['draw', '1d', '10s', '2c', '13c', '10c'][0m
+current player player3
+face deck ['10h', '11h', '8h', '12h', '5h', '7h', '6h', '1h', '13h', '4h', '4s', '4d', '3d', '12d', '12s', '13s', '2s', '1s', '5s', '11s', '6s', '9s', '7s', '7d', '9d', '9h', '9c', '7c', '11c', '8c', '4c', '5c', '5d', '11d', '13d', '2d', '6d', '6c', '13c']
+draw deck ['3h']
+[7mYou chose 12c from ['draw', '8s', '2h', '3s', '12c', '3c'][0m
+current player player4
+face deck ['10h', '11h', '8h', '12h', '5h', '7h', '6h', '1h', '13h', '4h', '4s', '4d', '3d', '12d', '12s', '13s', '2s', '1s', '5s', '11s', '6s', '9s', '7s', '7d', '9d', '9h', '9c', '7c', '11c', '8c', '4c', '5c', '5d', '11d', '13d', '2d', '6d', '6c', '13c', '12c']
+draw deck ['3h']
+[7mYou chose draw from ['draw', '1c'][0m
+current player player1
+face deck ['11h', '8h', '12h', '5h', '7h', '6h', '1h', '13h', '4h', '4s', '4d', '3d', '12d', '12s', '13s', '2s', '1s', '5s', '11s', '6s', '9s', '7s', '7d', '9d', '9h', '9c', '7c', '11c', '8c', '4c', '5c', '5d', '11d', '13d', '2d', '6d', '6c', '13c', '12c']
+draw deck ['10h']
+[7mYou chose draw from ['draw', '10d', '8d'][0m
+current player player2
+face deck ['8h', '12h', '5h', '7h', '6h', '1h', '13h', '4h', '4s', '4d', '3d', '12d', '12s', '13s', '2s', '1s', '5s', '11s', '6s', '9s', '7s', '7d', '9d', '9h', '9c', '7c', '11c', '8c', '4c', '5c', '5d', '11d', '13d', '2d', '6d', '6c', '13c', '12c']
+draw deck ['11h']
+[7mYou chose 10s from ['draw', '1d', '10s', '2c', '10c'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 10c from ['draw', '1d', '10s', '2c', '10c'][0m
+current player player3
+face deck ['8h', '12h', '5h', '7h', '6h', '1h', '13h', '4h', '4s', '4d', '3d', '12d', '12s', '13s', '2s', '1s', '5s', '11s', '6s', '9s', '7s', '7d', '9d', '9h', '9c', '7c', '11c', '8c', '4c', '5c', '5d', '11d', '13d', '2d', '6d', '6c', '13c', '12c', '10c']
+draw deck ['11h']
+[7mYou chose 2h from ['draw', '8s', '2h', '3s', '3c'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 2h from ['draw', '8s', '2h', '3s', '3c'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 3c from ['draw', '8s', '2h', '3s', '3c'][0m
+current player player4
+face deck ['8h', '12h', '5h', '7h', '6h', '1h', '13h', '4h', '4s', '4d', '3d', '12d', '12s', '13s', '2s', '1s', '5s', '11s', '6s', '9s', '7s', '7d', '9d', '9h', '9c', '7c', '11c', '8c', '4c', '5c', '5d', '11d', '13d', '2d', '6d', '6c', '13c', '12c', '10c', '3c']
+draw deck ['11h']
+[7mYou chose 3h from ['draw', '1c', '3h'][0m
+current player player1
+face deck ['8h', '12h', '5h', '7h', '6h', '1h', '13h', '4h', '4s', '4d', '3d', '12d', '12s', '13s', '2s', '1s', '5s', '11s', '6s', '9s', '7s', '7d', '9d', '9h', '9c', '7c', '11c', '8c', '4c', '5c', '5d', '11d', '13d', '2d', '6d', '6c', '13c', '12c', '10c', '3c', '3h']
+draw deck ['11h']
+[7mYou chose 10d from ['draw', '10d', '8d', '10h'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 10h from ['draw', '10d', '8d', '10h'][0m
+current player player2
+face deck ['8h', '12h', '5h', '7h', '6h', '1h', '13h', '4h', '4s', '4d', '3d', '12d', '12s', '13s', '2s', '1s', '5s', '11s', '6s', '9s', '7s', '7d', '9d', '9h', '9c', '7c', '11c', '8c', '4c', '5c', '5d', '11d', '13d', '2d', '6d', '6c', '13c', '12c', '10c', '3c', '3h', '10h']
+draw deck ['11h']
+[7mYou chose 2c from ['draw', '1d', '10s', '2c'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 1d from ['draw', '1d', '10s', '2c'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 2c from ['draw', '1d', '10s', '2c'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 10s from ['draw', '1d', '10s', '2c'][0m
+current player player3
+face deck ['8h', '12h', '5h', '7h', '6h', '1h', '13h', '4h', '4s', '4d', '3d', '12d', '12s', '13s', '2s', '1s', '5s', '11s', '6s', '9s', '7s', '7d', '9d', '9h', '9c', '7c', '11c', '8c', '4c', '5c', '5d', '11d', '13d', '2d', '6d', '6c', '13c', '12c', '10c', '3c', '3h', '10h', '10s']
+draw deck ['11h']
+[7mYou chose 2h from ['draw', '8s', '2h', '3s'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 8s from ['draw', '8s', '2h', '3s'][0m
+current player player4
+face deck ['8h', '12h', '5h', '7h', '6h', '1h', '13h', '4h', '4s', '4d', '3d', '12d', '12s', '13s', '2s', '1s', '5s', '11s', '6s', '9s', '7s', '7d', '9d', '9h', '9c', '7c', '11c', '8c', '4c', '5c', '5d', '11d', '13d', '2d', '6d', '6c', '13c', '12c', '10c', '3c', '3h', '10h', '10s', '8s']
+draw deck ['11h']
+[7mYou chose 1c from ['draw', '1c'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose draw from ['draw', '1c'][0m
+current player player1
+face deck ['12h', '5h', '7h', '6h', '1h', '13h', '4h', '4s', '4d', '3d', '12d', '12s', '13s', '2s', '1s', '5s', '11s', '6s', '9s', '7s', '7d', '9d', '9h', '9c', '7c', '11c', '8c', '4c', '5c', '5d', '11d', '13d', '2d', '6d', '6c', '13c', '12c', '10c', '3c', '3h', '10h', '10s', '8s']
+draw deck ['8h']
+[7mYou chose 8d from ['draw', '10d', '8d'][0m
+current player player2
+face deck ['12h', '5h', '7h', '6h', '1h', '13h', '4h', '4s', '4d', '3d', '12d', '12s', '13s', '2s', '1s', '5s', '11s', '6s', '9s', '7s', '7d', '9d', '9h', '9c', '7c', '11c', '8c', '4c', '5c', '5d', '11d', '13d', '2d', '6d', '6c', '13c', '12c', '10c', '3c', '3h', '10h', '10s', '8s', '8d']
+draw deck ['8h']
+[7mYou chose draw from ['draw', '1d', '2c'][0m
+current player player3
+face deck ['5h', '7h', '6h', '1h', '13h', '4h', '4s', '4d', '3d', '12d', '12s', '13s', '2s', '1s', '5s', '11s', '6s', '9s', '7s', '7d', '9d', '9h', '9c', '7c', '11c', '8c', '4c', '5c', '5d', '11d', '13d', '2d', '6d', '6c', '13c', '12c', '10c', '3c', '3h', '10h', '10s', '8s', '8d']
+draw deck ['12h']
+[7mYou chose 3s from ['draw', '2h', '3s'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 2h from ['draw', '2h', '3s'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 2h from ['draw', '2h', '3s'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 2h from ['draw', '2h', '3s'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose draw from ['draw', '2h', '3s'][0m
+current player player4
+face deck ['7h', '6h', '1h', '13h', '4h', '4s', '4d', '3d', '12d', '12s', '13s', '2s', '1s', '5s', '11s', '6s', '9s', '7s', '7d', '9d', '9h', '9c', '7c', '11c', '8c', '4c', '5c', '5d', '11d', '13d', '2d', '6d', '6c', '13c', '12c', '10c', '3c', '3h', '10h', '10s', '8s', '8d']
+draw deck ['5h']
+[7mYou chose 1c from ['draw', '1c', '11h'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose draw from ['draw', '1c', '11h'][0m
+current player player1
+face deck ['6h', '1h', '13h', '4h', '4s', '4d', '3d', '12d', '12s', '13s', '2s', '1s', '5s', '11s', '6s', '9s', '7s', '7d', '9d', '9h', '9c', '7c', '11c', '8c', '4c', '5c', '5d', '11d', '13d', '2d', '6d', '6c', '13c', '12c', '10c', '3c', '3h', '10h', '10s', '8s', '8d']
+draw deck ['7h']
+[7mYou chose draw from ['draw', '10d'][0m
+current player player2
+face deck ['1h', '13h', '4h', '4s', '4d', '3d', '12d', '12s', '13s', '2s', '1s', '5s', '11s', '6s', '9s', '7s', '7d', '9d', '9h', '9c', '7c', '11c', '8c', '4c', '5c', '5d', '11d', '13d', '2d', '6d', '6c', '13c', '12c', '10c', '3c', '3h', '10h', '10s', '8s', '8d']
+draw deck ['6h']
+[7mYou chose 1d from ['draw', '1d', '2c', '8h'][0m
+current player player3
+face deck ['1h', '13h', '4h', '4s', '4d', '3d', '12d', '12s', '13s', '2s', '1s', '5s', '11s', '6s', '9s', '7s', '7d', '9d', '9h', '9c', '7c', '11c', '8c', '4c', '5c', '5d', '11d', '13d', '2d', '6d', '6c', '13c', '12c', '10c', '3c', '3h', '10h', '10s', '8s', '8d', '1d']
+draw deck ['6h']
+[7mYou chose 12h from ['draw', '2h', '3s', '12h'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 2h from ['draw', '2h', '3s', '12h'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 3s from ['draw', '2h', '3s', '12h'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 12h from ['draw', '2h', '3s', '12h'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 2h from ['draw', '2h', '3s', '12h'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 2h from ['draw', '2h', '3s', '12h'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 2h from ['draw', '2h', '3s', '12h'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 12h from ['draw', '2h', '3s', '12h'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 3s from ['draw', '2h', '3s', '12h'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 3s from ['draw', '2h', '3s', '12h'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 12h from ['draw', '2h', '3s', '12h'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 2h from ['draw', '2h', '3s', '12h'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose draw from ['draw', '2h', '3s', '12h'][0m
+current player player4
+face deck ['13h', '4h', '4s', '4d', '3d', '12d', '12s', '13s', '2s', '1s', '5s', '11s', '6s', '9s', '7s', '7d', '9d', '9h', '9c', '7c', '11c', '8c', '4c', '5c', '5d', '11d', '13d', '2d', '6d', '6c', '13c', '12c', '10c', '3c', '3h', '10h', '10s', '8s', '8d', '1d']
+draw deck ['1h']
+[7mYou chose 1c from ['draw', '1c', '11h', '5h'][0m
+current player player1
+face deck ['13h', '4h', '4s', '4d', '3d', '12d', '12s', '13s', '2s', '1s', '5s', '11s', '6s', '9s', '7s', '7d', '9d', '9h', '9c', '7c', '11c', '8c', '4c', '5c', '5d', '11d', '13d', '2d', '6d', '6c', '13c', '12c', '10c', '3c', '3h', '10h', '10s', '8s', '8d', '1d', '1c']
+draw deck ['1h']
+[7mYou chose 7h from ['draw', '10d', '7h'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 7h from ['draw', '10d', '7h'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 10d from ['draw', '10d', '7h'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose draw from ['draw', '10d', '7h'][0m
+current player player2
+face deck ['4h', '4s', '4d', '3d', '12d', '12s', '13s', '2s', '1s', '5s', '11s', '6s', '9s', '7s', '7d', '9d', '9h', '9c', '7c', '11c', '8c', '4c', '5c', '5d', '11d', '13d', '2d', '6d', '6c', '13c', '12c', '10c', '3c', '3h', '10h', '10s', '8s', '8d', '1d', '1c']
+draw deck ['13h']
+[7mYou chose draw from ['draw', '2c', '8h'][0m
+current player player3
+face deck ['4s', '4d', '3d', '12d', '12s', '13s', '2s', '1s', '5s', '11s', '6s', '9s', '7s', '7d', '9d', '9h', '9c', '7c', '11c', '8c', '4c', '5c', '5d', '11d', '13d', '2d', '6d', '6c', '13c', '12c', '10c', '3c', '3h', '10h', '10s', '8s', '8d', '1d', '1c']
+draw deck ['4h']
+[7mYou chose 2h from ['draw', '2h', '3s', '12h', '6h'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 12h from ['draw', '2h', '3s', '12h', '6h'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 3s from ['draw', '2h', '3s', '12h', '6h'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 12h from ['draw', '2h', '3s', '12h', '6h'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose draw from ['draw', '2h', '3s', '12h', '6h'][0m
+current player player4
+face deck ['4d', '3d', '12d', '12s', '13s', '2s', '1s', '5s', '11s', '6s', '9s', '7s', '7d', '9d', '9h', '9c', '7c', '11c', '8c', '4c', '5c', '5d', '11d', '13d', '2d', '6d', '6c', '13c', '12c', '10c', '3c', '3h', '10h', '10s', '8s', '8d', '1d', '1c']
+draw deck ['4s']
+[7mYou chose draw from ['draw', '11h', '5h'][0m
+current player player1
+face deck ['3d', '12d', '12s', '13s', '2s', '1s', '5s', '11s', '6s', '9s', '7s', '7d', '9d', '9h', '9c', '7c', '11c', '8c', '4c', '5c', '5d', '11d', '13d', '2d', '6d', '6c', '13c', '12c', '10c', '3c', '3h', '10h', '10s', '8s', '8d', '1d', '1c']
+draw deck ['4d']
+[7mYou chose draw from ['draw', '10d', '7h', '1h'][0m
+current player player2
+face deck ['12d', '12s', '13s', '2s', '1s', '5s', '11s', '6s', '9s', '7s', '7d', '9d', '9h', '9c', '7c', '11c', '8c', '4c', '5c', '5d', '11d', '13d', '2d', '6d', '6c', '13c', '12c', '10c', '3c', '3h', '10h', '10s', '8s', '8d', '1d', '1c']
+draw deck ['3d']
+[7mYou chose draw from ['draw', '2c', '8h', '13h'][0m
+current player player3
+face deck ['12s', '13s', '2s', '1s', '5s', '11s', '6s', '9s', '7s', '7d', '9d', '9h', '9c', '7c', '11c', '8c', '4c', '5c', '5d', '11d', '13d', '2d', '6d', '6c', '13c', '12c', '10c', '3c', '3h', '10h', '10s', '8s', '8d', '1d', '1c']
+draw deck ['12d']
+[7mYou chose 6h from ['draw', '2h', '3s', '12h', '6h', '4h'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose draw from ['draw', '2h', '3s', '12h', '6h', '4h'][0m
+current player player4
+face deck ['13s', '2s', '1s', '5s', '11s', '6s', '9s', '7s', '7d', '9d', '9h', '9c', '7c', '11c', '8c', '4c', '5c', '5d', '11d', '13d', '2d', '6d', '6c', '13c', '12c', '10c', '3c', '3h', '10h', '10s', '8s', '8d', '1d', '1c']
+draw deck ['12s']
+[7mYou chose 11h from ['draw', '11h', '5h', '4s'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose draw from ['draw', '11h', '5h', '4s'][0m
+current player player1
+face deck ['2s', '1s', '5s', '11s', '6s', '9s', '7s', '7d', '9d', '9h', '9c', '7c', '11c', '8c', '4c', '5c', '5d', '11d', '13d', '2d', '6d', '6c', '13c', '12c', '10c', '3c', '3h', '10h', '10s', '8s', '8d', '1d', '1c']
+draw deck ['13s']
+[7mYou chose 1h from ['draw', '10d', '7h', '1h', '4d'][0m
+current player player2
+face deck ['2s', '1s', '5s', '11s', '6s', '9s', '7s', '7d', '9d', '9h', '9c', '7c', '11c', '8c', '4c', '5c', '5d', '11d', '13d', '2d', '6d', '6c', '13c', '12c', '10c', '3c', '3h', '10h', '10s', '8s', '8d', '1d', '1c', '1h']
+draw deck ['13s']
+[7mYou chose 3d from ['draw', '2c', '8h', '13h', '3d'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 3d from ['draw', '2c', '8h', '13h', '3d'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 13h from ['draw', '2c', '8h', '13h', '3d'][0m
+current player player3
+face deck ['2s', '1s', '5s', '11s', '6s', '9s', '7s', '7d', '9d', '9h', '9c', '7c', '11c', '8c', '4c', '5c', '5d', '11d', '13d', '2d', '6d', '6c', '13c', '12c', '10c', '3c', '3h', '10h', '10s', '8s', '8d', '1d', '1c', '1h', '13h']
+draw deck ['13s']
+[7mYou chose 3s from ['draw', '2h', '3s', '12h', '6h', '4h', '12d'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 4h from ['draw', '2h', '3s', '12h', '6h', '4h', '12d'][0m
+current player player4
+face deck ['2s', '1s', '5s', '11s', '6s', '9s', '7s', '7d', '9d', '9h', '9c', '7c', '11c', '8c', '4c', '5c', '5d', '11d', '13d', '2d', '6d', '6c', '13c', '12c', '10c', '3c', '3h', '10h', '10s', '8s', '8d', '1d', '1c', '1h', '13h', '4h']
+draw deck ['13s']
+[7mYou chose 5h from ['draw', '11h', '5h', '4s', '12s'][0m
+current player player1
+face deck ['2s', '1s', '5s', '11s', '6s', '9s', '7s', '7d', '9d', '9h', '9c', '7c', '11c', '8c', '4c', '5c', '5d', '11d', '13d', '2d', '6d', '6c', '13c', '12c', '10c', '3c', '3h', '10h', '10s', '8s', '8d', '1d', '1c', '1h', '13h', '4h', '5h']
+draw deck ['13s']
+[7mYou chose draw from ['draw', '10d', '7h', '4d'][0m
+current player player2
+face deck ['1s', '5s', '11s', '6s', '9s', '7s', '7d', '9d', '9h', '9c', '7c', '11c', '8c', '4c', '5c', '5d', '11d', '13d', '2d', '6d', '6c', '13c', '12c', '10c', '3c', '3h', '10h', '10s', '8s', '8d', '1d', '1c', '1h', '13h', '4h', '5h']
+draw deck ['2s']
+[7mYou chose 2c from ['draw', '2c', '8h', '3d'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose draw from ['draw', '2c', '8h', '3d'][0m
+current player player3
+face deck ['5s', '11s', '6s', '9s', '7s', '7d', '9d', '9h', '9c', '7c', '11c', '8c', '4c', '5c', '5d', '11d', '13d', '2d', '6d', '6c', '13c', '12c', '10c', '3c', '3h', '10h', '10s', '8s', '8d', '1d', '1c', '1h', '13h', '4h', '5h']
+draw deck ['1s']
+[7mYou chose 2h from ['draw', '2h', '3s', '12h', '6h', '12d'][0m
+current player player4
+face deck ['5s', '11s', '6s', '9s', '7s', '7d', '9d', '9h', '9c', '7c', '11c', '8c', '4c', '5c', '5d', '11d', '13d', '2d', '6d', '6c', '13c', '12c', '10c', '3c', '3h', '10h', '10s', '8s', '8d', '1d', '1c', '1h', '13h', '4h', '5h', '2h']
+draw deck ['1s']
+[7mYou chose 12s from ['draw', '11h', '4s', '12s'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 11h from ['draw', '11h', '4s', '12s'][0m
+current player player1
+face deck ['5s', '11s', '6s', '9s', '7s', '7d', '9d', '9h', '9c', '7c', '11c', '8c', '4c', '5c', '5d', '11d', '13d', '2d', '6d', '6c', '13c', '12c', '10c', '3c', '3h', '10h', '10s', '8s', '8d', '1d', '1c', '1h', '13h', '4h', '5h', '2h', '11h']
+draw deck ['1s']
+[7mYou chose 4d from ['draw', '10d', '7h', '4d', '13s'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 4d from ['draw', '10d', '7h', '4d', '13s'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 4d from ['draw', '10d', '7h', '4d', '13s'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 10d from ['draw', '10d', '7h', '4d', '13s'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 10d from ['draw', '10d', '7h', '4d', '13s'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 10d from ['draw', '10d', '7h', '4d', '13s'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 7h from ['draw', '10d', '7h', '4d', '13s'][0m
+current player player2
+face deck ['5s', '11s', '6s', '9s', '7s', '7d', '9d', '9h', '9c', '7c', '11c', '8c', '4c', '5c', '5d', '11d', '13d', '2d', '6d', '6c', '13c', '12c', '10c', '3c', '3h', '10h', '10s', '8s', '8d', '1d', '1c', '1h', '13h', '4h', '5h', '2h', '11h', '7h']
+draw deck ['1s']
+[7mYou chose 3d from ['draw', '2c', '8h', '3d', '2s'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 2s from ['draw', '2c', '8h', '3d', '2s'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 2s from ['draw', '2c', '8h', '3d', '2s'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 3d from ['draw', '2c', '8h', '3d', '2s'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 2c from ['draw', '2c', '8h', '3d', '2s'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 3d from ['draw', '2c', '8h', '3d', '2s'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 8h from ['draw', '2c', '8h', '3d', '2s'][0m
+current player player3
+face deck ['5s', '11s', '6s', '9s', '7s', '7d', '9d', '9h', '9c', '7c', '11c', '8c', '4c', '5c', '5d', '11d', '13d', '2d', '6d', '6c', '13c', '12c', '10c', '3c', '3h', '10h', '10s', '8s', '8d', '1d', '1c', '1h', '13h', '4h', '5h', '2h', '11h', '7h', '8h']
+draw deck ['1s']
+[7mYou chose 12h from ['draw', '3s', '12h', '6h', '12d'][0m
+current player player4
+face deck ['5s', '11s', '6s', '9s', '7s', '7d', '9d', '9h', '9c', '7c', '11c', '8c', '4c', '5c', '5d', '11d', '13d', '2d', '6d', '6c', '13c', '12c', '10c', '3c', '3h', '10h', '10s', '8s', '8d', '1d', '1c', '1h', '13h', '4h', '5h', '2h', '11h', '7h', '8h', '12h']
+draw deck ['1s']
+[7mYou chose 4s from ['draw', '4s', '12s'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 12s from ['draw', '4s', '12s'][0m
+current player player1
+face deck ['5s', '11s', '6s', '9s', '7s', '7d', '9d', '9h', '9c', '7c', '11c', '8c', '4c', '5c', '5d', '11d', '13d', '2d', '6d', '6c', '13c', '12c', '10c', '3c', '3h', '10h', '10s', '8s', '8d', '1d', '1c', '1h', '13h', '4h', '5h', '2h', '11h', '7h', '8h', '12h', '12s']
+draw deck ['1s']
+[7mYou chose draw from ['draw', '10d', '4d', '13s'][0m
+current player player2
+face deck ['11s', '6s', '9s', '7s', '7d', '9d', '9h', '9c', '7c', '11c', '8c', '4c', '5c', '5d', '11d', '13d', '2d', '6d', '6c', '13c', '12c', '10c', '3c', '3h', '10h', '10s', '8s', '8d', '1d', '1c', '1h', '13h', '4h', '5h', '2h', '11h', '7h', '8h', '12h', '12s']
+draw deck ['5s']
+[7mYou chose 2c from ['draw', '2c', '3d', '2s'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose draw from ['draw', '2c', '3d', '2s'][0m
+current player player3
+face deck ['6s', '9s', '7s', '7d', '9d', '9h', '9c', '7c', '11c', '8c', '4c', '5c', '5d', '11d', '13d', '2d', '6d', '6c', '13c', '12c', '10c', '3c', '3h', '10h', '10s', '8s', '8d', '1d', '1c', '1h', '13h', '4h', '5h', '2h', '11h', '7h', '8h', '12h', '12s']
+draw deck ['11s']
+[7mYou chose draw from ['draw', '3s', '6h', '12d'][0m
+current player player4
+face deck ['9s', '7s', '7d', '9d', '9h', '9c', '7c', '11c', '8c', '4c', '5c', '5d', '11d', '13d', '2d', '6d', '6c', '13c', '12c', '10c', '3c', '3h', '10h', '10s', '8s', '8d', '1d', '1c', '1h', '13h', '4h', '5h', '2h', '11h', '7h', '8h', '12h', '12s']
+draw deck ['6s']
+[7mYou chose draw from ['draw', '4s'][0m
+current player player1
+face deck ['7s', '7d', '9d', '9h', '9c', '7c', '11c', '8c', '4c', '5c', '5d', '11d', '13d', '2d', '6d', '6c', '13c', '12c', '10c', '3c', '3h', '10h', '10s', '8s', '8d', '1d', '1c', '1h', '13h', '4h', '5h', '2h', '11h', '7h', '8h', '12h', '12s']
+draw deck ['9s']
+[7mYou chose draw from ['draw', '10d', '4d', '13s', '1s'][0m
+current player player2
+face deck ['7d', '9d', '9h', '9c', '7c', '11c', '8c', '4c', '5c', '5d', '11d', '13d', '2d', '6d', '6c', '13c', '12c', '10c', '3c', '3h', '10h', '10s', '8s', '8d', '1d', '1c', '1h', '13h', '4h', '5h', '2h', '11h', '7h', '8h', '12h', '12s']
+draw deck ['7s']
+[7mYou chose 2s from ['draw', '2c', '3d', '2s', '5s'][0m
+current player player3
+face deck ['7d', '9d', '9h', '9c', '7c', '11c', '8c', '4c', '5c', '5d', '11d', '13d', '2d', '6d', '6c', '13c', '12c', '10c', '3c', '3h', '10h', '10s', '8s', '8d', '1d', '1c', '1h', '13h', '4h', '5h', '2h', '11h', '7h', '8h', '12h', '12s', '2s']
+draw deck ['7s']
+[7mYou chose 6h from ['draw', '3s', '6h', '12d', '11s'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 12d from ['draw', '3s', '6h', '12d', '11s'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 11s from ['draw', '3s', '6h', '12d', '11s'][0m
+current player player4
+face deck ['7d', '9d', '9h', '9c', '7c', '11c', '8c', '4c', '5c', '5d', '11d', '13d', '2d', '6d', '6c', '13c', '12c', '10c', '3c', '3h', '10h', '10s', '8s', '8d', '1d', '1c', '1h', '13h', '4h', '5h', '2h', '11h', '7h', '8h', '12h', '12s', '2s', '11s']
+draw deck ['7s']
+[7mYou chose 4s from ['draw', '4s', '6s'][0m
+current player player1
+face deck ['7d', '9d', '9h', '9c', '7c', '11c', '8c', '4c', '5c', '5d', '11d', '13d', '2d', '6d', '6c', '13c', '12c', '10c', '3c', '3h', '10h', '10s', '8s', '8d', '1d', '1c', '1h', '13h', '4h', '5h', '2h', '11h', '7h', '8h', '12h', '12s', '2s', '11s', '4s']
+draw deck ['7s']
+[7mYou chose 10d from ['draw', '10d', '4d', '13s', '1s', '9s'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 13s from ['draw', '10d', '4d', '13s', '1s', '9s'][0m
+current player player2
+face deck ['7d', '9d', '9h', '9c', '7c', '11c', '8c', '4c', '5c', '5d', '11d', '13d', '2d', '6d', '6c', '13c', '12c', '10c', '3c', '3h', '10h', '10s', '8s', '8d', '1d', '1c', '1h', '13h', '4h', '5h', '2h', '11h', '7h', '8h', '12h', '12s', '2s', '11s', '4s', '13s']
+draw deck ['7s']
+[7mYou chose 2c from ['draw', '2c', '3d', '5s'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 2c from ['draw', '2c', '3d', '5s'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose draw from ['draw', '2c', '3d', '5s'][0m
+current player player3
+face deck ['9d', '9h', '9c', '7c', '11c', '8c', '4c', '5c', '5d', '11d', '13d', '2d', '6d', '6c', '13c', '12c', '10c', '3c', '3h', '10h', '10s', '8s', '8d', '1d', '1c', '1h', '13h', '4h', '5h', '2h', '11h', '7h', '8h', '12h', '12s', '2s', '11s', '4s', '13s']
+draw deck ['7d']
+[7mYou chose draw from ['draw', '3s', '6h', '12d'][0m
+current player player4
+face deck ['9h', '9c', '7c', '11c', '8c', '4c', '5c', '5d', '11d', '13d', '2d', '6d', '6c', '13c', '12c', '10c', '3c', '3h', '10h', '10s', '8s', '8d', '1d', '1c', '1h', '13h', '4h', '5h', '2h', '11h', '7h', '8h', '12h', '12s', '2s', '11s', '4s', '13s']
+draw deck ['9d']
+[7mYou chose 6s from ['draw', '6s'][0m
+current player player1
+face deck ['9h', '9c', '7c', '11c', '8c', '4c', '5c', '5d', '11d', '13d', '2d', '6d', '6c', '13c', '12c', '10c', '3c', '3h', '10h', '10s', '8s', '8d', '1d', '1c', '1h', '13h', '4h', '5h', '2h', '11h', '7h', '8h', '12h', '12s', '2s', '11s', '4s', '13s', '6s']
+draw deck ['9d']
+[7mYou chose 10d from ['draw', '10d', '4d', '1s', '9s'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 9s from ['draw', '10d', '4d', '1s', '9s'][0m
+current player player2
+face deck ['9h', '9c', '7c', '11c', '8c', '4c', '5c', '5d', '11d', '13d', '2d', '6d', '6c', '13c', '12c', '10c', '3c', '3h', '10h', '10s', '8s', '8d', '1d', '1c', '1h', '13h', '4h', '5h', '2h', '11h', '7h', '8h', '12h', '12s', '2s', '11s', '4s', '13s', '6s', '9s']
+draw deck ['9d']
+[7mYou chose draw from ['draw', '2c', '3d', '5s', '7s'][0m
+current player player3
+face deck ['9c', '7c', '11c', '8c', '4c', '5c', '5d', '11d', '13d', '2d', '6d', '6c', '13c', '12c', '10c', '3c', '3h', '10h', '10s', '8s', '8d', '1d', '1c', '1h', '13h', '4h', '5h', '2h', '11h', '7h', '8h', '12h', '12s', '2s', '11s', '4s', '13s', '6s', '9s']
+draw deck ['9h']
+[7mYou chose 7d from ['draw', '3s', '6h', '12d', '7d'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 12d from ['draw', '3s', '6h', '12d', '7d'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 6h from ['draw', '3s', '6h', '12d', '7d'][0m
+[31mThe requirement 'face deck is empty or choice is draw or rank of choice is rank of top card of face deck or suit of choice is suit of top card of face deck' was not met. Try again.[0m
+[7mYou chose 3s from ['draw', '3s', '6h', '12d', '7d'][0m
+player4 has won
