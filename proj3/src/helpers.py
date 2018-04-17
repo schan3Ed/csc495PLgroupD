@@ -483,7 +483,7 @@ def s__p02__player_with_highest_X(args):
     def fun(args=args):
         highest=None
         playerWithHighest = None
-        for player in the.script.players
+        for player in the.script.players:
             attrValue = getExpr(player).get()[getExpr(x).get()]
             if highest is None or highest < attrValue:
                 highest = attrValue
